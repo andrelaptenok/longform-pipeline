@@ -1,0 +1,33 @@
+# Quality criteria. Populated in stage B.
+# Calibration source: the official CKE rubric for matura.
+
+version: v0
+
+deterministic:
+  - id: length
+    description: word count within the target range
+    params: { min_words: 0, max_words: 0 }
+
+  - id: sections_present
+    description: all required sections are present
+    params: { required: [] }
+
+  - id: banned_constructions
+    description: no banned constructions present
+    params: { patterns: [] }
+
+judge:
+  - id: structure
+    weight: 0
+    description: logic and coherence of the structure
+    scale: 1-5
+
+  - id: style
+    weight: 0
+    description: match to the target style and level
+    scale: 1-5
+
+  - id: task_fit
+    weight: 0
+    description: match to the exam task format
+    scale: 1-5
