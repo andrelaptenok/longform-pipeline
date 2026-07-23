@@ -13,6 +13,14 @@
   ],
   "license": "MIT",
   "author": "Andrei Laptsenak <andrelaptenok@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrelaptenok/longform-pipeline.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andrelaptenok/longform-pipeline/issues"
+  },
+  "homepage": "https://github.com/andrelaptenok/longform-pipeline#readme",
   "type": "module",
   "engines": {
     "node": ">=20"
