@@ -1,5 +1,7 @@
 # longform-pipeline
 
+[![CI](https://github.com/andrelaptenok/longform-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/andrelaptenok/longform-pipeline/actions/workflows/ci.yml)
+
 Pipeline for generating long, structured texts with an eval system.
 
 **Domain:** learning materials for the matura exam (English language). Quality
