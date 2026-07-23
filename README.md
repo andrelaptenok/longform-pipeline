@@ -5,7 +5,7 @@
 `longform-pipeline` generates long, structured texts with an LLM and scores
 their quality with an eval system built around an external reference.
 
-**Domain:** learning materials for the Polish *matura* exam (English language).
+**Domain:** learning materials for the Polish _matura_ exam (English language).
 
 **The core idea is calibration against an external standard.** LLM output
 quality is usually judged by taste. Here it is scored against the official CKE
