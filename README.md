@@ -2,12 +2,22 @@
 
 [![CI](https://github.com/andrelaptenok/longform-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/andrelaptenok/longform-pipeline/actions/workflows/ci.yml)
 
-Pipeline for generating long, structured texts with an eval system.
+`longform-pipeline` generates long, structured texts with an LLM and scores
+their quality with an eval system built around an external reference.
 
-**Domain:** learning materials for the matura exam (English language). Quality
-criteria are anchored to the official CKE scoring rubric rather than subjective
-preference, which allows calibrating the LLM-as-judge against an external
-reference.
+**Domain:** learning materials for the Polish *matura* exam (English language).
+
+**The core idea is calibration against an external standard.** LLM output
+quality is usually judged by taste. Here it is scored against the official CKE
+rubric (the Polish exam board's) rather than subjective preference, so the
+LLM-as-judge can be calibrated against an objective reference — that
+calibration is the point of the project.
+
+The pipeline is deliberately eval-driven, not a thin API wrapper: prompts are
+versioned artifacts, every generation call is logged (tokens, cost, latency,
+prompt version), and quality is measured with deterministic checks before
+falling back to the LLM-judge. The aim is a reproducible, measurable
+generation loop — not a one-shot demo.
 
 ## Stack
 
