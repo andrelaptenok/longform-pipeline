@@ -17,9 +17,11 @@ evals/
   rubric.yaml     quality criteria (CKE dimensions, weights, score anchors)
   rubric.ts       rubric schema + validating loader
   dataset/
+    TEMPLATE.md   copyable item, documents the frontmatter
     train/        development set
     test/         held out for the final run — do not touch
   dataset.ts      dataset item (frontmatter + gold reference)
+  specs.ts        rubric defaults + item overrides -> checks to run
   yaml.ts         shared YAML parsing and validation helpers
   checks/         deterministic checks + registry (length, sections, banned)
   runners/        check execution (run.ts)
@@ -29,7 +31,7 @@ src/
   pipeline/       generation steps: plan -> sections -> assemble -> revise
   providers/      unified interface over models (types, index, anthropic)
   logging/        JSONL log per call: tokens, cost, latency
-docs/             architecture, decisions, limitations
+docs/             architecture, decisions, limitations, labeling protocol
 ```
 
 Tests are not in the tree because they are never apart from it: a module is
