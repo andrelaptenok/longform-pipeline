@@ -1,11 +1,13 @@
 version: v1
 
 source:
-  name: CKE, wypowiedź pisemna, poziom rozszerzony
-  points: treść 5 / spójność i logika 2 / zakres środków językowych 3 / poprawność środków językowych 3
+  name: CKE, wypowiedź pisemna, poziom rozszerzony, Formuła 2023
+  points: zgodność z poleceniem 5 / spójność i logika wypowiedzi 2 / zakres środków językowych 3 / poprawność środków językowych 3
   total: 13
+  length: 200-250 words
   weights: judge weights are the CKE point maxima; every dimension is still scored on the same 1-5 scale
-  verify: rerun against the current CKE informator before the final test measurement
+  checked: 2026-07-26, against secondary sources reproducing the criteria; the informator PDF itself has not been read
+  verify: read the criteria table in the CKE informator before the final test measurement, and confirm how a response outside the word range is scored
 
 deterministic:
   - id: length
@@ -30,7 +32,7 @@ deterministic:
 
 judge:
   - id: content
-    cke_name: treść
+    cke_name: zgodność z poleceniem
     weight: 5
     description: every element of the task is covered and developed, in the required format and register
     scale: 1-5
