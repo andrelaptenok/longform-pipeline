@@ -12,8 +12,9 @@ human_scores: { content: 5, coherence: 4, range: 4, accuracy: 5 }
 The gold reference material goes here — the full text a top answer would look
 like, in the format the brief asks for.
 
-Copy this file into `train/` (or `test/`, for the held-out set) under a name that
-matches its `id` — the corpus gate checks that they agree. `derived_from`,
+Copy this file into `drafts/` while the material is being written, then into
+`train/` or `test/` once it carries `human_scores`. The file name has to match
+its `id` — the corpus gate checks that they agree. `derived_from`,
 `expected` and `human_scores` are the optional fields; the last two are needed
 before an item counts as labeled.
 

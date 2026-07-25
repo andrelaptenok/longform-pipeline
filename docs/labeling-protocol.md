@@ -121,6 +121,18 @@ average hides exactly the case that would have taught something.
 - a spread of quality, not only top answers — a corpus of fives cannot calibrate
   anything, since a judge that always answers 5 would score perfectly on it
 
+### Drafts
+
+An unlabeled material is not yet an item. Materials wait in
+`evals/dataset/drafts/` until they carry `human_scores`, and a labeler moves a
+file into `train/` or `test/` at the moment it is scored — the split it lands in
+is part of the labeling decision. The gate checks that drafts parse and pass the
+deterministic layer, so what is left to do to one is exactly the scoring.
+
+Writing a material and scoring it are separate jobs, and a draft written by
+somebody else is easier to score honestly than one written by the labeler an
+hour earlier.
+
 ### Controlled degradation
 
 The spread is built, not collected. Write one strong material per task type,
