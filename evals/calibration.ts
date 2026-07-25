@@ -14,6 +14,16 @@ export function calibrate(
   verdicts: JudgeVerdict[],
 ): DimensionCalibration[] {
   const byId = new Map(items.map((item) => [item.id, item]));
+  const seen = new Set<string>();
+
+  for (const verdict of verdicts) {
+    if (seen.has(verdict.itemId)) {
+      throw new Error(
+        `calibration got two verdicts for "${verdict.itemId}"; each item is judged once`,
+      );
+    }
+    seen.add(verdict.itemId);
+  }
 
   return rubric.judge.flatMap((dimension) => {
     const human: number[] = [];

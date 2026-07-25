@@ -166,6 +166,18 @@ describe('parseVerdict', () => {
     );
   });
 
+  it('rejects an invented dimension named after a prototype property', () => {
+    const shadowed = JSON.stringify({
+      content: { score: 4, why: 'ok' },
+      accuracy: { score: 5, why: 'ok' },
+      toString: { score: 3, why: 'ok' },
+    });
+
+    expect(() => parseVerdict(shadowed, RUBRIC)).toThrow(
+      /invented dimensions: toString/,
+    );
+  });
+
   it('reports a reply that carries no JSON at all', () => {
     expect(() =>
       parseVerdict('I would rather not score this.', RUBRIC),

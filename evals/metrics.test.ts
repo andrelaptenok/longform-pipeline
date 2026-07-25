@@ -100,6 +100,18 @@ describe('agreement', () => {
     expect(result.spearman).toBeCloseTo(1, 10);
   });
 
+  it('refuses a score the scale does not contain', () => {
+    expect(() => agreement([0, 3, 5], [1, 3, 5], SCALE)).toThrow(
+      /human score 0 is not a whole number on the scale 1-5/,
+    );
+    expect(() => agreement([1, 3, 5], [1, 3, 6], SCALE)).toThrow(
+      /judge score 6 is not a whole number/,
+    );
+    expect(() => agreement([1, 3], [1, 3.5], SCALE)).toThrow(
+      /judge score 3.5 is not a whole number/,
+    );
+  });
+
   it('refuses mismatched or empty input rather than inventing a number', () => {
     expect(() => agreement([1, 2], [1], SCALE)).toThrow(
       /one judge score per human score/,

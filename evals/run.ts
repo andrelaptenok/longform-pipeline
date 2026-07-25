@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { appendFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { RunLogger } from '../src/logging/logger.js';
 import { getProvider } from '../src/providers/index.js';
@@ -12,6 +12,12 @@ import { evaluateItem } from './specs.js';
 
 const DATASET = 'evals/dataset/train';
 const REPORTS = 'evals/reports';
+
+interface JudgeFailure {
+  itemId: string;
+  file: string;
+  error: string;
+}
 
 function report(item: DatasetItem, results: CheckResult[]): void {
   const failed = results.filter((r) => !r.pass).length;
@@ -35,11 +41,22 @@ function reportCalibration(rows: DimensionCalibration[]): void {
 async function runJudge(rubric: Rubric, dataset: DatasetItem[]) {
   const provider = getProvider(process.env.PROVIDER ?? 'claude');
   const logger = new RunLogger('judge');
+  const trail = join(REPORTS, `verdicts-${logger.runId}.jsonl`);
   const verdicts: JudgeVerdict[] = [];
+  const failures: JudgeFailure[] = [];
 
   console.log(`\nJudging ${dataset.length} items with ${provider.model}...`);
+
   for (const item of dataset) {
-    verdicts.push(await judgeItem(provider, rubric, item, { logger }));
+    try {
+      const verdict = await judgeItem(provider, rubric, item, { logger });
+      verdicts.push(verdict);
+      appendFileSync(trail, JSON.stringify(verdict) + '\n', 'utf8');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      failures.push({ itemId: item.id, file: item.file, error: message });
+      console.error(`  UNJUDGED ${item.id}: ${message}`);
+    }
   }
 
   const calibration = calibrate(rubric, dataset, verdicts);
@@ -47,16 +64,24 @@ async function runJudge(rubric: Rubric, dataset: DatasetItem[]) {
 
   const summary = logger.summary();
   console.log(
-    `\nJudge run ${summary.runId}: ${summary.calls} calls, $${summary.totalCostUsd.toFixed(4)}`,
+    `\nJudge run ${summary.runId}: ${verdicts.length}/${dataset.length} items judged, ${summary.calls} calls, $${summary.totalCostUsd.toFixed(4)}`,
   );
+  if (verdicts.length > 0) console.log(`Verdicts: ${trail}`);
+  if (failures.length > 0) {
+    console.error(
+      `${failures.length} items could not be judged; they are listed in the report below`,
+    );
+    process.exitCode = 1;
+  }
 
-  return { verdicts, calibration, summary };
+  return { trail, verdicts, failures, calibration, summary };
 }
 
 async function main() {
   const rubric = loadRubric();
   const dataset = loadDataset(DATASET);
   const withJudge = process.argv.includes('--judge');
+  const force = process.argv.includes('--force');
 
   if (dataset.length === 0) {
     console.error(
@@ -84,23 +109,29 @@ async function main() {
   }
   if (passed < results.length || dataset.length === 0) process.exitCode = 1;
 
-  const judge =
-    withJudge && dataset.length > 0
-      ? await runJudge(rubric, dataset)
-      : undefined;
-
-  const output = {
+  const output: Record<string, unknown> = {
     timestamp: new Date().toISOString(),
     rubricVersion: rubric.version,
     datasetSize: dataset.length,
     results,
-    judge,
   };
 
-  mkdirSync(REPORTS, { recursive: true });
-  const path = join(REPORTS, `eval-${Date.now()}.json`);
-  writeFileSync(path, JSON.stringify(output, null, 2), 'utf8');
-  console.log(`Report: ${path}`);
+  try {
+    if (withJudge && dataset.length > 0) {
+      if (passed < results.length && !force) {
+        console.error(
+          `\nNot judging: ${results.length - passed} items fail the deterministic layer, so the calibration would measure a corpus that is known to be wrong. Fix them, or rerun with --force.`,
+        );
+      } else {
+        output.judge = await runJudge(rubric, dataset);
+      }
+    }
+  } finally {
+    mkdirSync(REPORTS, { recursive: true });
+    const path = join(REPORTS, `eval-${Date.now()}.json`);
+    writeFileSync(path, JSON.stringify(output, null, 2), 'utf8');
+    console.log(`Report: ${path}`);
+  }
 }
 
 await main();
