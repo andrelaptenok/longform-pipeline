@@ -25,6 +25,7 @@ describe('parseDatasetItem', () => {
     expect(item.taskType).toBe('informal_email');
     expect(item.brief).toMatch(/informal email/);
     expect(item.source).toBe('self-authored');
+    expect(item.derivedFrom).toBeNull();
     expect(item.expected.length).toEqual({ min_words: 80, max_words: 130 });
     expect(item.humanScores).toEqual({ content: 5, coherence: 4 });
     expect(item.file).toBe('informal-email-01.md');
@@ -72,6 +73,33 @@ describe('parseDatasetItem', () => {
     expect(() =>
       parseDatasetItem('---\nid: a\ntask_type: t\nbrief: b\n---\ntext', 'x.md'),
     ).toThrow(/x\.md: source must be a non-empty string/);
+  });
+
+  it('reads the base a variant was degraded from', () => {
+    const variant = parseDatasetItem(
+      "---\nid: b\ntask_type: t\nbrief: b\nsource: 'self-authored, degraded from a: coherence'\nderived_from: a\n---\ntext",
+      'b.md',
+    );
+
+    expect(variant.derivedFrom).toBe('a');
+  });
+
+  it('rejects an item derived from itself', () => {
+    expect(() =>
+      parseDatasetItem(
+        '---\nid: a\ntask_type: t\nbrief: b\nsource: s\nderived_from: a\n---\ntext',
+        'x.md',
+      ),
+    ).toThrow(/x\.md: derived_from must name another item/);
+  });
+
+  it('rejects a derived_from that is not a name', () => {
+    expect(() =>
+      parseDatasetItem(
+        '---\nid: a\ntask_type: t\nbrief: b\nsource: s\nderived_from: 12\n---\ntext',
+        'x.md',
+      ),
+    ).toThrow(/derived_from must be a non-empty string/);
   });
 
   it('rejects non-numeric human scores', () => {

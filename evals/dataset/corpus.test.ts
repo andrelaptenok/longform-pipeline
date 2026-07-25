@@ -8,9 +8,11 @@ const TRAIN = 'evals/dataset/train';
 const HELD_OUT = 'evals/dataset/test';
 
 const train = () => loadDataset(TRAIN);
+const heldOut = () => loadDataset(HELD_OUT);
 const corpus = () => [...loadDataset(TRAIN), ...loadDataset(HELD_OUT)];
 
 const where = (item: DatasetItem) => `${item.file} (${item.id})`;
+const familyOf = (item: DatasetItem) => item.derivedFrom ?? item.id;
 
 describe('the committed corpus', () => {
   it('parses every item in both splits', () => {
@@ -59,12 +61,50 @@ describe('the committed corpus', () => {
     }
   });
 
+  it('derives every variant from a base material that exists', () => {
+    const items = corpus();
+    const byId = new Map(items.map((item) => [item.id, item]));
+
+    for (const item of items) {
+      if (item.derivedFrom === null) continue;
+      expect(byId.has(item.derivedFrom), where(item)).toBe(true);
+    }
+  });
+
+  it('derives variants from base materials, never from other variants', () => {
+    const items = corpus();
+    const byId = new Map(items.map((item) => [item.id, item]));
+
+    for (const item of items) {
+      if (item.derivedFrom === null) continue;
+      expect(byId.get(item.derivedFrom)?.derivedFrom, where(item)).toBe(null);
+    }
+  });
+
+  it('tells the same story in source and derived_from', () => {
+    for (const item of corpus()) {
+      if (item.derivedFrom === null) continue;
+      expect(item.source, where(item)).toContain(item.derivedFrom);
+    }
+  });
+
   it('resolves every check override against the rubric', () => {
     const rubric = loadRubric();
 
     for (const item of corpus()) {
       expect(() => checkSpecsFor(rubric, item), where(item)).not.toThrow();
     }
+  });
+});
+
+describe('the split between train and test', () => {
+  it('keeps a base material and its variants on one side', () => {
+    const trainFamilies = new Set(train().map(familyOf));
+    const leaked = heldOut()
+      .filter((item) => trainFamilies.has(familyOf(item)))
+      .map((item) => `${where(item)} shares a base with train`);
+
+    expect(leaked).toEqual([]);
   });
 });
 

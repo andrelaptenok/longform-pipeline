@@ -43,12 +43,16 @@ Options considered, and why the chosen one won:
    empty text. A judge calibrated on that measures agreement on a distribution
    the exam does not contain.
 
-`source` values follow one of two forms, so the origin of every item is
-machine-readable at a glance:
+A variant records its base twice: in `derived_from`, which the gate reads, and
+in `source`, which a person reads.
 
-- `self-authored` — a base material.
-- `self-authored, degraded from <base id>: <dimension>` — a variant, naming the
-  item it came from and the dimension the defect targets.
+- Base material: `source: self-authored`, no `derived_from`.
+- Variant: `derived_from: <base id>` plus
+  `source: 'self-authored, degraded from <base id>: <dimension>'`.
+
+The gate checks that the two agree, that the named base exists, and that it is
+itself a base rather than another variant — degradation is one level deep, so a
+family is always a base and the variants hanging off it.
 
 ## Scale and anchors
 
@@ -126,7 +130,8 @@ Two rules make this defensible rather than convenient:
   connectives stripped often reads as thinner in `range` as well.
 - **`test/` shares no base material with `train/`.** A held-out item that is a
   variant of a training item is not held out. Write the test bases separately,
-  on different topics.
+  on different topics. `npm test` enforces this from `derived_from`: a base and
+  its variants have to sit on one side of the split.
 
 The variants of one base are near-duplicates of each other, so agreement
 measured across them is optimistic: the judge sees the same text repeatedly with

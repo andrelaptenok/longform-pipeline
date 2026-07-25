@@ -8,6 +8,7 @@ export interface DatasetItem {
   taskType: string;
   brief: string;
   source: string;
+  derivedFrom: string | null;
   expected: Record<string, CheckParams>;
   humanScores: Record<string, number>;
   reference: string;
@@ -43,6 +44,21 @@ function readHumanScores(raw: unknown, file: string): Record<string, number> {
   return scores;
 }
 
+function readDerivedFrom(
+  raw: unknown,
+  id: string,
+  file: string,
+): string | null {
+  if (raw === undefined || raw === null) return null;
+
+  if (typeof raw !== 'string' || raw.trim().length === 0) {
+    fail(file, 'derived_from must be a non-empty string');
+  }
+  if (raw === id) fail(file, 'derived_from must name another item');
+
+  return raw;
+}
+
 export function parseDatasetItem(source: string, file: string): DatasetItem {
   const match = FRONTMATTER.exec(source);
   if (!match?.[1]) fail(file, 'missing YAML frontmatter');
@@ -54,11 +70,14 @@ export function parseDatasetItem(source: string, file: string): DatasetItem {
     fail(file, 'the body must carry the gold reference material');
   }
 
+  const id = requireString(meta, 'id', file);
+
   return {
-    id: requireString(meta, 'id', file),
+    id,
     taskType: requireString(meta, 'task_type', file),
     brief: requireString(meta, 'brief', file),
     source: requireString(meta, 'source', file),
+    derivedFrom: readDerivedFrom(meta.derived_from, id, file),
     expected: readExpected(meta.expected, file),
     humanScores: readHumanScores(meta.human_scores, file),
     reference,
