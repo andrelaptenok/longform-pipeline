@@ -12,8 +12,11 @@
   `docs/labeling-protocol.md`
 - a single labeler assigns every score; until a second one joins, self-agreement
   is the only check on drift
-- quality is judged by deterministic checks only; the LLM-judge and its
-  calibration against human scores do not exist yet
+- the LLM-judge runs and its agreement with a human can be computed, but nothing
+  has been measured: with no corpus there is no calibration, no prompt
+  iteration, and no threshold that says whether the judge is ready
+- the judge scores each dimension independently; CKE's gate (see below) is
+  checked on human scores in the corpus gate but not applied to judge output
 - `evals/rubric.yaml` matches the CKE informator for poziom rozszerzony, checked
   against it on 2026-07-26. What the rubric does not model is CKE's dependency
   between criteria: a `zgodność z poleceniem` of 0 forces every other criterion
@@ -29,7 +32,8 @@
 
 1. Write the base materials, derive the graded variants, and label everything
    against the protocol
-2. LLM-as-judge, calibrated against the human scores (QWK per dimension)
+2. Calibrate the judge on train: iterate `judge.vN`, set the threshold, then
+   measure once on test and write `docs/calibration.md`
 3. Build out the steps: sections, assemble, revise
 4. RAG over the corpus
 5. OpenAI / Gemini / Ollama providers, comparative run
@@ -46,3 +50,5 @@
 - the scaffold for collection: an item template, a labeling protocol, and a
   test that gates every committed item on parsing, a full set of human scores,
   and the deterministic layer
+- the LLM-judge, the agreement metrics (QWK, MAE, exact, within 1, Spearman)
+  and the calibration that pairs judge scores with expert ones per dimension
