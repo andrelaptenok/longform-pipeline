@@ -3,8 +3,11 @@ import { dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import type { GenerateResult } from '../providers/types.js';
 
+export type RunKind = 'generate' | 'judge';
+
 export interface CallRecord {
   runId: string;
+  kind: RunKind;
   step: string;
   promptVersion: string;
   model: string;
@@ -12,20 +15,29 @@ export interface CallRecord {
   outputTokens: number;
   costUsd: number;
   latencyMs: number;
+  stopReason: string | null;
   timestamp: string;
+}
+
+export function logPathFor(kind: RunKind): string {
+  return `evals/reports/${kind}.jsonl`;
 }
 
 export class RunLogger {
   readonly runId = randomUUID();
   private readonly records: CallRecord[] = [];
 
-  constructor(private readonly path = 'evals/reports/calls.jsonl') {
+  constructor(
+    private readonly kind: RunKind,
+    private readonly path = logPathFor(kind),
+  ) {
     mkdirSync(dirname(this.path), { recursive: true });
   }
 
   record(step: string, promptVersion: string, result: GenerateResult): void {
     const entry: CallRecord = {
       runId: this.runId,
+      kind: this.kind,
       step,
       promptVersion,
       model: result.model,
@@ -33,6 +45,7 @@ export class RunLogger {
       outputTokens: result.usage.outputTokens,
       costUsd: result.costUsd,
       latencyMs: result.latencyMs,
+      stopReason: result.stopReason,
       timestamp: new Date().toISOString(),
     };
     this.records.push(entry);
@@ -42,11 +55,14 @@ export class RunLogger {
   summary() {
     return {
       runId: this.runId,
+      kind: this.kind,
       calls: this.records.length,
       totalCostUsd: this.records.reduce((s, r) => s + r.costUsd, 0),
       totalLatencyMs: this.records.reduce((s, r) => s + r.latencyMs, 0),
       inputTokens: this.records.reduce((s, r) => s + r.inputTokens, 0),
       outputTokens: this.records.reduce((s, r) => s + r.outputTokens, 0),
+      truncatedCalls: this.records.filter((r) => r.stopReason === 'max_tokens')
+        .length,
     };
   }
 }
