@@ -4,7 +4,10 @@
 
 - only one pipeline step is implemented (plan)
 - the corpus is empty — `evals/dataset/train/` and `test/` carry no labeled
-  materials yet, so `npm run eval` has nothing to measure
+  materials yet, so `npm run eval` has nothing to measure, and the gate over the
+  corpus passes vacuously
+- the provenance of the materials is undecided, which blocks collection; see
+  `docs/labeling-protocol.md`
 - quality is judged by deterministic checks only; the LLM-judge and its
   calibration against human scores do not exist yet
 - `evals/rubric.yaml` follows the CKE scheme for poziom rozszerzony, but the
@@ -15,8 +18,8 @@
 
 ## Roadmap
 
-1. Collect a reference corpus (20-30), split into train / test, with a written
-   labeling protocol and a decision on the provenance of the materials
+1. Decide the provenance of the materials, then collect a reference corpus
+   (20-30) and label it against the protocol
 2. LLM-as-judge, calibrated against the human scores (QWK per dimension)
 3. Build out the steps: sections, assemble, revise
 4. RAG over the corpus
@@ -31,3 +34,6 @@
   the check params and the human scores
 - `evals/rubric.yaml` populated with the four CKE dimensions, their point
   weights and score anchors
+- the scaffold for collection: an item template, a labeling protocol, and a
+  test that gates every committed item on parsing, a full set of human scores,
+  and the deterministic layer
