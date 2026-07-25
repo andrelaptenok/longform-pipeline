@@ -6,6 +6,7 @@ import { checkSpecsFor, evaluateItem } from '../specs.js';
 
 const TRAIN = 'evals/dataset/train';
 const HELD_OUT = 'evals/dataset/test';
+const DRAFTS = 'evals/dataset/drafts';
 
 const train = () => loadDataset(TRAIN);
 const heldOut = () => loadDataset(HELD_OUT);
@@ -106,6 +107,20 @@ describe('the committed corpus', () => {
 
     for (const item of corpus()) {
       expect(() => checkSpecsFor(rubric, item), where(item)).not.toThrow();
+    }
+  });
+});
+
+describe('the drafts', () => {
+  it('parse and pass the deterministic layer, so labeling is all that is left', () => {
+    const rubric = loadRubric();
+
+    for (const item of loadDataset(DRAFTS)) {
+      const failed = evaluateItem(rubric, item)
+        .filter((result) => !result.pass)
+        .map((result) => `${result.id}: ${result.detail}`);
+
+      expect(failed, where(item)).toEqual([]);
     }
   });
 });
