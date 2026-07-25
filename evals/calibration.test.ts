@@ -108,6 +108,16 @@ describe('calibrate', () => {
     });
   });
 
+  it('refuses two verdicts for one item rather than counting it twice', () => {
+    expect(() =>
+      calibrate(
+        RUBRIC,
+        [item('a', { content: 4 })],
+        [verdict('a', { content: 4 }), verdict('a', { content: 2 })],
+      ),
+    ).toThrow(/two verdicts for "a"/);
+  });
+
   it('reports nothing for a dimension no item carries', () => {
     const result = calibrate(
       RUBRIC,

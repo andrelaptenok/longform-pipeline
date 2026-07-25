@@ -116,7 +116,9 @@ export function parseVerdict(
     scores[dimension.id] = { score, why };
   }
 
-  const unknown = Object.keys(record).filter((key) => !(key in scores));
+  const unknown = Object.keys(record).filter(
+    (key) => !Object.hasOwn(scores, key),
+  );
   if (unknown.length > 0) {
     throw new Error(`judge invented dimensions: ${unknown.join(', ')}`);
   }

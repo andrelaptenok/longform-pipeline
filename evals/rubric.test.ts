@@ -66,6 +66,18 @@ describe('parseRubric', () => {
     );
   });
 
+  it('rejects a scale it could not turn into bounds', () => {
+    expect(() =>
+      parseRubric(
+        RUBRIC.replace('scale: 1-5', 'scale: one to five'),
+        'rubric.yaml',
+      ),
+    ).toThrow(/judge\[0\]\.scale must read like "1-5"/);
+    expect(() =>
+      parseRubric(RUBRIC.replace('scale: 1-5', 'scale: 5-1'), 'rubric.yaml'),
+    ).toThrow(/low bound first/);
+  });
+
   it('prefixes a YAML syntax error with the file', () => {
     expect(() => parseRubric('version: [unclosed', 'rubric.yaml')).toThrow(
       /rubric\.yaml: invalid YAML/,

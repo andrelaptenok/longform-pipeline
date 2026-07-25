@@ -44,12 +44,31 @@ export function agreementWithin(
   return hits / human.length;
 }
 
+function requireWithin(
+  values: number[],
+  scale: ScaleBounds,
+  side: string,
+): void {
+  const stray = values.find(
+    (value) =>
+      !Number.isInteger(value) || value < scale.min || value > scale.max,
+  );
+
+  if (stray !== undefined) {
+    throw new Error(
+      `${side} score ${stray} is not a whole number on the scale ${scale.min}-${scale.max}`,
+    );
+  }
+}
+
 export function quadraticWeightedKappa(
   human: number[],
   judge: number[],
   scale: ScaleBounds,
 ): number {
   requirePairs(human, judge);
+  requireWithin(human, scale, 'human');
+  requireWithin(judge, scale, 'judge');
 
   const levels = scale.max - scale.min + 1;
   if (levels < 2) throw new Error('a scale needs at least two levels');

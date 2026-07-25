@@ -82,6 +82,12 @@ function readDimension(
     fail(file, `${label}.weight must be a positive number`);
   }
 
+  const scale = requireString(record, 'scale', file, `${label}.scale`);
+  const bounds = /^\s*(\d+)\s*-\s*(\d+)\s*$/.exec(scale);
+  if (!bounds?.[1] || !bounds[2] || Number(bounds[1]) >= Number(bounds[2])) {
+    fail(file, `${label}.scale must read like "1-5", low bound first`);
+  }
+
   return {
     id: requireString(record, 'id', file, `${label}.id`),
     cke_name: requireString(record, 'cke_name', file, `${label}.cke_name`),
@@ -92,7 +98,7 @@ function readDimension(
       file,
       `${label}.description`,
     ),
-    scale: requireString(record, 'scale', file, `${label}.scale`),
+    scale,
     anchors: readAnchors(record.anchors, `${label}.anchors`, file),
   };
 }
