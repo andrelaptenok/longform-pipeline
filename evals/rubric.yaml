@@ -2,17 +2,22 @@ version: v1
 
 source:
   name: CKE, wypowiedź pisemna, poziom rozszerzony, Formuła 2023
+  document: Informator o egzaminie maturalnym z języka angielskiego od roku szkolnego 2024/2025, sections 1.3.4 and 1.3.8
   points: zgodność z poleceniem 5 / spójność i logika wypowiedzi 2 / zakres środków językowych 3 / poprawność środków językowych 3
   total: 13
-  length: 200-250 words
+  share_of_exam: 22%
+  length_asked: 200-250 words, stated in the task instruction
+  length_scored: 180-280 words, the band that earns the length element of zgodność z poleceniem
+  length_floor: below 160 words only zgodność z poleceniem is scored; every other criterion is 0 and errors are not marked
+  dependencies: zgodność z poleceniem 0 forces every other criterion to 0; zgodność z poleceniem 1 caps every other criterion at 1
   weights: judge weights are the CKE point maxima; every dimension is still scored on the same 1-5 scale
-  checked: 2026-07-26, against secondary sources reproducing the criteria; the informator PDF itself has not been read
-  verify: read the criteria table in the CKE informator before the final test measurement, and confirm how a response outside the word range is scored
+  checked: 2026-07-26 against the informator itself
+  verify: re-read when CKE publishes a new edition of the informator
 
 deterministic:
   - id: length
-    description: word count within the CKE range for the task
-    params: { min_words: 200, max_words: 250 }
+    description: word count within the band CKE scores, not the narrower band the task asks for
+    params: { min_words: 180, max_words: 280 }
 
   - id: sections_present
     description: all sections the task format requires are present

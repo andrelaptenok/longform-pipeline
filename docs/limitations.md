@@ -14,11 +14,11 @@
   is the only check on drift
 - quality is judged by deterministic checks only; the LLM-judge and its
   calibration against human scores do not exist yet
-- `evals/rubric.yaml` follows the CKE scheme for poziom rozszerzony. The point
-  split (5/2/3/3 = 13) and the 200-250 word range were checked on 2026-07-26
-  against secondary sources that reproduce the criteria; the informator itself
-  has not been read, and how a response outside the word range is scored is
-  still unknown — the length check treats it as a plain fail
+- `evals/rubric.yaml` matches the CKE informator for poziom rozszerzony, checked
+  against it on 2026-07-26. What the rubric does not model is CKE's dependency
+  between criteria: a `zgodność z poleceniem` of 0 forces every other criterion
+  to 0, and a 1 caps them at 1. Aggregating judge scores into a total will have
+  to account for that, or the total will read higher than CKE's would
 - RAG is not wired in
 - a single provider (Anthropic); its pricing is hardcoded next to the model id
   in `getProvider` and has to be updated by hand when either changes

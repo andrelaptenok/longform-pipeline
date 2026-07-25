@@ -65,6 +65,18 @@ The rubric is the only reference. If an item cannot be scored from the anchors,
 the anchors are wrong: fix them in a new rubric version and relabel, rather than
 scoring on intuition and moving on.
 
+Three CKE rules sit outside the anchors and apply before them:
+
+- A response under **160 words** is scored on `content` only; the other three
+  dimensions are 0.
+- Length earns its point anywhere in **180–280 words**, even though the task
+  asks for 200–250. Do not mark a 190-word material down for length.
+- `content` gates the rest: at 0 every other dimension is 0, at 1 no other
+  dimension goes above 1. A material that misses the task cannot score well on
+  range or accuracy, however well written it is.
+
+These are recorded in `evals/rubric.yaml` under `source`.
+
 ## Procedure
 
 For each item:
