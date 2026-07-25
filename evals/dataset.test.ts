@@ -51,7 +51,16 @@ describe('parseDatasetItem', () => {
   it('rejects an item without an id', () => {
     expect(() =>
       parseDatasetItem('---\ntask_type: t\nbrief: b\n---\ntext', 'x.md'),
-    ).toThrow(/"id" is required/);
+    ).toThrow(/x\.md: id must be a non-empty string/);
+  });
+
+  it('rejects an item whose body carries no reference material', () => {
+    expect(() =>
+      parseDatasetItem(
+        '---\nid: a\ntask_type: t\nbrief: b\n---\n\n  \n',
+        'x.md',
+      ),
+    ).toThrow(/x\.md: the body must carry the gold reference material/);
   });
 
   it('rejects non-numeric human scores', () => {
@@ -60,5 +69,10 @@ describe('parseDatasetItem', () => {
     expect(() => parseDatasetItem(bad, 'x.md')).toThrow(
       /human_scores.content must be a number/,
     );
+  });
+
+  it('prefixes a YAML syntax error with the file', () => {
+    const bad = '---\nbrief: [unclosed\n---\ntext';
+    expect(() => parseDatasetItem(bad, 'x.md')).toThrow(/x\.md: invalid YAML/);
   });
 });

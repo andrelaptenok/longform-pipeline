@@ -76,6 +76,7 @@ async function main() {
       `\nDeterministic checks: ${passed}/${results.length} items passed`,
     );
   }
+  if (passed < results.length || dataset.length === 0) process.exitCode = 1;
 
   const output = {
     timestamp: new Date().toISOString(),

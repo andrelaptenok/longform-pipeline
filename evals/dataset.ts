@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { parse } from 'yaml';
 import type { CheckParams } from './checks/index.js';
+import { fail, parseYaml, requireMap, requireString } from './yaml.js';
 
 export interface DatasetItem {
   id: string;
@@ -15,26 +15,13 @@ export interface DatasetItem {
 
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
 
-function fail(file: string, message: string): never {
-  throw new Error(`${file}: ${message}`);
-}
-
-function asRecord(value: unknown): Record<string, unknown> | undefined {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : undefined;
-}
-
 function readExpected(raw: unknown, file: string): Record<string, CheckParams> {
   if (raw === undefined) return {};
-  const record =
-    asRecord(raw) ?? fail(file, 'frontmatter "expected" must be a map');
+  const record = requireMap(raw, file, 'expected');
   const expected: Record<string, CheckParams> = {};
 
   for (const [checkId, params] of Object.entries(record)) {
-    expected[checkId] =
-      asRecord(params) ??
-      fail(file, `expected.${checkId} must be a map of params`);
+    expected[checkId] = requireMap(params, file, `expected.${checkId}`);
   }
 
   return expected;
@@ -42,8 +29,7 @@ function readExpected(raw: unknown, file: string): Record<string, CheckParams> {
 
 function readHumanScores(raw: unknown, file: string): Record<string, number> {
   if (raw === undefined) return {};
-  const record =
-    asRecord(raw) ?? fail(file, 'frontmatter "human_scores" must be a map');
+  const record = requireMap(raw, file, 'human_scores');
   const scores: Record<string, number> = {};
 
   for (const [dimension, score] of Object.entries(record)) {
@@ -60,26 +46,20 @@ export function parseDatasetItem(source: string, file: string): DatasetItem {
   const match = FRONTMATTER.exec(source);
   if (!match?.[1]) fail(file, 'missing YAML frontmatter');
 
-  const meta =
-    asRecord(parse(match[1])) ?? fail(file, 'frontmatter must be a map');
-  const { id, task_type: taskType, brief } = meta;
+  const meta = requireMap(parseYaml(match[1], file), file, 'frontmatter');
+  const reference = source.slice(match[0].length).trim();
 
-  if (typeof id !== 'string' || id.length === 0)
-    fail(file, 'frontmatter "id" is required');
-  if (typeof taskType !== 'string' || taskType.length === 0) {
-    fail(file, 'frontmatter "task_type" is required');
-  }
-  if (typeof brief !== 'string' || brief.length === 0) {
-    fail(file, 'frontmatter "brief" is required');
+  if (reference.length === 0) {
+    fail(file, 'the body must carry the gold reference material');
   }
 
   return {
-    id,
-    taskType,
-    brief,
+    id: requireString(meta, 'id', file),
+    taskType: requireString(meta, 'task_type', file),
+    brief: requireString(meta, 'brief', file),
     expected: readExpected(meta.expected, file),
     humanScores: readHumanScores(meta.human_scores, file),
-    reference: source.slice(match[0].length).trim(),
+    reference,
     file,
   };
 }
@@ -88,7 +68,8 @@ export function loadDataset(dir: string): DatasetItem[] {
   return readdirSync(dir)
     .filter((name) => name.endsWith('.md'))
     .sort()
-    .map((name) =>
-      parseDatasetItem(readFileSync(join(dir, name), 'utf8'), name),
-    );
+    .map((name) => {
+      const path = join(dir, name);
+      return parseDatasetItem(readFileSync(path, 'utf8'), path);
+    });
 }
