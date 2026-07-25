@@ -91,6 +91,14 @@ describe('the committed rubric', () => {
     ]);
   });
 
+  it('checks length against the band CKE scores, not the one it asks for', () => {
+    const length = loadRubric().deterministic.find(
+      (check) => check.id === 'length',
+    );
+
+    expect(length?.params).toEqual({ min_words: 180, max_words: 280 });
+  });
+
   it('anchors every dimension at the ends of the scale', () => {
     for (const dimension of loadRubric().judge) {
       expect(Object.keys(dimension.anchors)).toEqual(['1', '3', '5']);
