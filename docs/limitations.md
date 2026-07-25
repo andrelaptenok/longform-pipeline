@@ -14,7 +14,10 @@
   point split and the word range still have to be verified against the current
   informator
 - RAG is not wired in
-- a single provider (Anthropic)
+- a single provider (Anthropic); its pricing is hardcoded next to the model id
+  in `getProvider` and has to be updated by hand when either changes
+- a failed stream is not resumed — a mid-stream network error costs the tokens
+  already generated
 
 ## Roadmap
 
