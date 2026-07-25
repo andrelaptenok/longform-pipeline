@@ -29,8 +29,8 @@ evals/
 src/
   cli.ts          entry point for `npm run gen`
   pipeline/       generation steps: plan -> sections -> assemble -> revise
-  providers/      unified interface over models (types, index, anthropic)
-  logging/        JSONL log per call: tokens, cost, latency
+  providers/      unified interface over models (types, index, anthropic, http)
+  logging/        JSONL log per call: tokens, cost, latency, stop reason
 docs/             architecture, decisions, limitations, labeling protocol
 ```
 
