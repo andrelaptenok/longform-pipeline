@@ -7,6 +7,7 @@ export interface DatasetItem {
   id: string;
   taskType: string;
   brief: string;
+  source: string;
   expected: Record<string, CheckParams>;
   humanScores: Record<string, number>;
   reference: string;
@@ -57,6 +58,7 @@ export function parseDatasetItem(source: string, file: string): DatasetItem {
     id: requireString(meta, 'id', file),
     taskType: requireString(meta, 'task_type', file),
     brief: requireString(meta, 'brief', file),
+    source: requireString(meta, 'source', file),
     expected: readExpected(meta.expected, file),
     humanScores: readHumanScores(meta.human_scores, file),
     reference,

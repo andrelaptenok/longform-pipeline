@@ -1,23 +1,13 @@
 import 'dotenv/config';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import {
-  runChecks,
-  type CheckResult,
-  type CheckSpec,
-} from '../checks/index.js';
+import type { CheckResult } from '../checks/index.js';
 import { loadDataset, type DatasetItem } from '../dataset.js';
-import { loadRubric, type Rubric } from '../rubric.js';
+import { loadRubric } from '../rubric.js';
+import { evaluateItem } from '../specs.js';
 
 const DATASET = 'evals/dataset/train';
 const REPORTS = 'evals/reports';
-
-function specsFor(rubric: Rubric, item: DatasetItem): CheckSpec[] {
-  return rubric.deterministic.map((check) => ({
-    id: check.id,
-    params: { ...check.params, ...item.expected[check.id] },
-  }));
-}
 
 function report(item: DatasetItem, results: CheckResult[]): void {
   const failed = results.filter((r) => !r.pass).length;
@@ -40,7 +30,7 @@ async function main() {
   }
 
   const results = dataset.map((item) => {
-    const checks = runChecks(item.reference, specsFor(rubric, item));
+    const checks = evaluateItem(rubric, item);
     report(item, checks);
     return {
       id: item.id,
