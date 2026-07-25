@@ -1,7 +1,13 @@
 import 'dotenv/config';
-import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
+import {
+  runChecks,
+  type CheckResult,
+  type CheckSpec,
+} from '../checks/index.js';
+import { loadDataset, type DatasetItem } from '../dataset.js';
 
 const DATASET = 'evals/dataset/train';
 const REPORTS = 'evals/reports';
@@ -25,28 +31,26 @@ function loadRubric(): Rubric {
   return parse(readFileSync('evals/rubric.yaml', 'utf8')) as Rubric;
 }
 
-function loadDataset(): Array<{ name: string; content: string }> {
-  return readdirSync(DATASET)
-    .filter((f) => f.endsWith('.md'))
-    .map((f) => ({ name: f, content: readFileSync(join(DATASET, f), 'utf8') }));
+function specsFor(rubric: Rubric, item: DatasetItem): CheckSpec[] {
+  return rubric.deterministic.map((check) => ({
+    id: check.id,
+    params: { ...check.params, ...item.expected[check.id] },
+  }));
 }
 
-/**
- * Run scaffold. Later stages add here:
- *  - deterministic checks from rubric.deterministic
- *  - LLM-as-judge from rubric.judge, calibrated against reference materials
- *  - comparison against the previous run (regressions)
- */
+function report(item: DatasetItem, results: CheckResult[]): void {
+  const failed = results.filter((r) => !r.pass).length;
+  console.log(`\n${item.id} (${item.taskType}) — ${failed} failed`);
+  for (const result of results) {
+    console.log(
+      `  ${result.pass ? 'PASS' : 'FAIL'} ${result.id}: ${result.detail}`,
+    );
+  }
+}
+
 async function main() {
   const rubric = loadRubric();
-  const dataset = loadDataset();
-
-  const report = {
-    timestamp: new Date().toISOString(),
-    rubricVersion: rubric.version,
-    datasetSize: dataset.length,
-    results: [] as unknown[],
-  };
+  const dataset = loadDataset(DATASET);
 
   if (dataset.length === 0) {
     console.error(
@@ -54,9 +58,35 @@ async function main() {
     );
   }
 
+  const results = dataset.map((item) => {
+    const checks = runChecks(item.reference, specsFor(rubric, item));
+    report(item, checks);
+    return {
+      id: item.id,
+      file: item.file,
+      taskType: item.taskType,
+      deterministic: checks,
+      pass: checks.every((check) => check.pass),
+    };
+  });
+
+  const passed = results.filter((r) => r.pass).length;
+  if (dataset.length > 0) {
+    console.log(
+      `\nDeterministic checks: ${passed}/${results.length} items passed`,
+    );
+  }
+
+  const output = {
+    timestamp: new Date().toISOString(),
+    rubricVersion: rubric.version,
+    datasetSize: dataset.length,
+    results,
+  };
+
   mkdirSync(REPORTS, { recursive: true });
   const path = join(REPORTS, `eval-${Date.now()}.json`);
-  writeFileSync(path, JSON.stringify(report, null, 2), 'utf8');
+  writeFileSync(path, JSON.stringify(output, null, 2), 'utf8');
   console.log(`Report: ${path}`);
 }
 
