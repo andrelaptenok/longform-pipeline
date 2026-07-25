@@ -16,8 +16,10 @@ Copy this file into `train/` (or `test/`, for the held-out set) under a name
 that matches its `id` — the corpus gate checks that they agree. Every field above is required except `expected` and
 `human_scores`, and both are needed before an item counts as labeled:
 
-- `source` — where the material came from. `self-authored`, or a citation
-  precise enough to check the licence: this repository is public.
+- `source` — where the material came from, in one of two forms:
+  `self-authored` for a base material, or
+  `self-authored, degraded from <base id>: <dimension>` for a variant derived
+  from one. This repository is public, so the origin has to be checkable.
 - `expected` — per-check overrides, keyed by check id, layered over the
   defaults in `rubric.yaml`. Drop a key to keep the default; a key that names no
   check, or a param that check does not have, is an error rather than a shrug.
