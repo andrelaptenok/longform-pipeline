@@ -14,11 +14,13 @@ the project.
 ```
 prompts/          prompts as versioned files (plan.v1.md, ...)
 evals/
-  rubric.yaml     quality criteria (may carry Polish CKE terms)
+  rubric.yaml     quality criteria (CKE dimensions, weights, score anchors)
+  rubric.ts       rubric schema + validating loader
   dataset/
     train/        development set
     test/         held out for the final run — do not touch
   dataset.ts      dataset item (frontmatter + gold reference)
+  yaml.ts         shared YAML parsing and validation helpers
   checks/         deterministic checks + registry (length, sections, banned)
   runners/        check execution (run.ts)
   reports/        run output (git-ignored)
@@ -29,6 +31,9 @@ src/
   logging/        JSONL log per call: tokens, cost, latency
 docs/             architecture, decisions, limitations
 ```
+
+Tests are not in the tree because they are never apart from it: a module is
+covered by `<module>.test.ts` next to it.
 
 ## Commands
 
@@ -94,6 +99,13 @@ with the owner is in Russian, but none of it reaches the files.
 **No comments in code.** No inline comments, no docstrings, no TODOs. Names,
 types, and structure carry the intent; if something still needs explaining, it
 belongs in `docs/` or in the commit message.
+
+**Layout.** A test sits next to the module it covers
+(`checks/length.ts` → `checks/length.test.ts`), never in a separate tree. A
+directory appears when interchangeable units need a registry to pick between
+them (`evals/checks/`); a single responsibility stays a single file at the top
+of its area (`evals/yaml.ts`). A module that reads a directory of data sits
+beside it, sharing its name (`evals/dataset.ts` and `evals/dataset/`).
 
 **Commits.** Conventional Commits, imperative mood
 (`feat: add deterministic length check`). Never commit or push without an
