@@ -21,6 +21,7 @@ export interface GenerateResult {
   costUsd: number;
   latencyMs: number;
   model: string;
+  stopReason: string | null;
 }
 
 export interface Provider {

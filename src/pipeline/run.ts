@@ -20,7 +20,7 @@ export async function runPipeline(
   provider: Provider,
   input: PipelineInput,
 ): Promise<PipelineOutput> {
-  const logger = new RunLogger();
+  const logger = new RunLogger('generate');
 
   const planPrompt = loadPrompt('plan', 'v1');
   const plan = await provider.generate({
