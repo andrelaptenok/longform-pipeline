@@ -20,8 +20,17 @@ describe('extractSections', () => {
     expect(extractSections('He said: it was a good trip.')).toEqual([]);
   });
 
-  it('normalizes case and inner whitespace', () => {
+  it('ignores a sentence that merely ends with a colon', () => {
+    expect(extractSections('Here is what I remember about the trip:')).toEqual(
+      [],
+    );
+  });
+
+  it('normalizes case, punctuation and inner whitespace', () => {
     expect(extractSections('##   Main   BODY  ')).toEqual(['main body']);
+    expect(extractSections('# Greeting, opening')).toEqual([
+      'greeting opening',
+    ]);
   });
 });
 
@@ -35,9 +44,26 @@ describe('sectionsPresentCheck', () => {
     expect(result.observed).toMatchObject({ missing: [] });
   });
 
-  it('matches a required name inside a longer heading', () => {
+  it('matches a required name as a whole word inside a longer heading', () => {
     const wordy = '# Greeting\n...\n# Body of the email\n...\n# Closing line';
     expect(sectionsPresentCheck(wordy, params).pass).toBe(true);
+  });
+
+  it('does not match a required name buried inside another word', () => {
+    const result = sectionsPresentCheck('# Everybody\ntext', {
+      required: ['body'],
+    });
+    expect(result.pass).toBe(false);
+    expect(result.observed).toMatchObject({ missing: ['body'] });
+  });
+
+  it('matches a multi-word required name only in order', () => {
+    expect(
+      sectionsPresentCheck('# Main body', { required: ['main body'] }).pass,
+    ).toBe(true);
+    expect(
+      sectionsPresentCheck('# Body main', { required: ['main body'] }).pass,
+    ).toBe(false);
   });
 
   it('is case-insensitive on both sides', () => {
