@@ -24,6 +24,9 @@ evals/
   specs.ts        rubric defaults + item overrides -> checks to run
   yaml.ts         shared YAML parsing and validation helpers
   checks/         deterministic checks + registry (length, sections, banned)
+  judge.ts        LLM-judge: rubric -> prompt -> validated scores
+  metrics.ts      agreement metrics (QWK, MAE, exact, within 1, Spearman)
+  calibration.ts  judge scores vs human scores, per dimension
   run.ts          check execution for `npm run eval`
   reports/        run output (git-ignored)
 src/
@@ -44,7 +47,8 @@ covered by `<module>.test.ts` next to it, and the committed corpus by
 npm install
 cp .env.example .env   # ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY
 npm run gen            # generate (tsx src/cli.ts)
-npm run eval           # run evals (tsx evals/runners/run.ts)
+npm run eval           # deterministic checks only, no API calls
+npm run eval -- --judge  # also run the LLM-judge and report agreement (costs money)
 npm test               # unit tests (vitest run)
 npm run typecheck      # tsc --noEmit
 npm run lint           # eslint

@@ -42,6 +42,29 @@ per-check params and the human scores; the body is the gold reference. One unit
 feeds the deterministic checks, the judge and the calibration, so the three
 stages never drift apart.
 
+**The judge is told the rubric, not taught it.** The prompt file
+(`prompts/judge.v1.md`) holds the instructions and the output contract; the
+dimensions, scales and anchors are rendered into the system prompt from
+`rubric.yaml` at call time. Editing an anchor therefore changes what the judge
+is asked without touching the prompt version, and both versions are stamped on
+every verdict.
+
+**The judge's reply is validated, not trusted.** It must be JSON carrying every
+rubric dimension, an integer inside that dimension's scale, and a non-empty
+justification. A reply that fails is quoted back with the reason and one more
+attempt is made; after that the item fails loudly rather than entering the
+corpus with an invented score.
+
+**No sampling parameters anywhere.** `temperature` and friends are rejected by
+the current frontier models, so setting them would tie the pipeline to older
+ones. Determinism is not available at this layer; the calibration report is the
+place where that shows up honestly.
+
+**Judging is opt-in.** `npm run eval` runs the deterministic layer and touches
+no API. `npm run eval -- --judge` adds the judge, and only then is a provider
+constructed and a key required — a corpus-wide judge run costs money and should
+never happen by accident.
+
 **The rubric mirrors the CKE scheme.** Dimensions, their Polish names and their
 weights come from the official point split (treść 5 / spójność 2 / zakres 3 /
 poprawność 3), and each dimension carries anchors for 1, 3 and 5. Weights are
