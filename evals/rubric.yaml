@@ -1,33 +1,70 @@
-# Quality criteria. Populated in stage B.
-# Calibration source: the official CKE rubric for matura.
+version: v1
 
-version: v0
+source:
+  name: CKE, wypowiedź pisemna, poziom rozszerzony
+  points: treść 5 / spójność i logika 2 / zakres środków językowych 3 / poprawność środków językowych 3
+  total: 13
+  weights: judge weights are the CKE point maxima; every dimension is still scored on the same 1-5 scale
+  verify: rerun against the current CKE informator before the final test measurement
 
 deterministic:
   - id: length
-    description: word count within the target range
-    params: { min_words: 0, max_words: 0 }
+    description: word count within the CKE range for the task
+    params: { min_words: 200, max_words: 250 }
 
   - id: sections_present
-    description: all required sections are present
+    description: all sections the task format requires are present
     params: { required: [] }
 
   - id: banned_constructions
-    description: no banned constructions present
-    params: { patterns: [] }
+    description: no spoken reductions and no generated-text boilerplate
+    params:
+      patterns:
+        - '\bgonna\b'
+        - '\bwanna\b'
+        - '\bkinda\b'
+        - '\bgotta\b'
+        - "\\bin today's fast-paced world\\b"
+        - '\bit is important to note that\b'
+        - '\bdelve into\b'
 
 judge:
-  - id: structure
-    weight: 0
-    description: logic and coherence of the structure
+  - id: content
+    cke_name: treść
+    weight: 5
+    description: every element of the task is covered and developed, in the required format and register
     scale: 1-5
+    anchors:
+      '1': fewer than half the required elements are addressed, or the text drifts off the brief; a reader would not get what the task asked for
+      '3': all required elements appear, but some are only named rather than developed; occasional padding or an off-topic passage
+      '5': every element is present and developed, in the required format and register, with nothing off-brief
 
-  - id: style
-    weight: 0
-    description: match to the target style and level
+  - id: coherence
+    cke_name: spójność i logika wypowiedzi
+    weight: 2
+    description: the text reads as one line of thought, carried by paragraphing and cohesive devices
     scale: 1-5
+    anchors:
+      '1': no visible progression; paragraphs are unordered and linking words are missing or misused, so the reader has to reconstruct the argument
+      '3': the overall structure holds, but transitions are mechanical or one paragraph breaks the line of thought
+      '5': a clear line from opening to closing; paragraphing and cohesive devices carry the reader without effort
 
-  - id: task_fit
-    weight: 0
-    description: match to the exam task format
+  - id: range
+    cke_name: zakres środków językowych
+    weight: 3
+    description: variety and precision of vocabulary and grammatical structures at the level the task expects
     scale: 1-5
+    anchors:
+      '1': elementary repetitive vocabulary and one or two sentence patterns, below the level of the task
+      '3': adequate range with some variation, but reliant on common phrases and short of precise or idiomatic choices
+      '5': varied and precise lexis and structures suited to the level and register, used naturally rather than for display
+
+  - id: accuracy
+    cke_name: poprawność środków językowych
+    weight: 3
+    description: grammar, lexis, spelling and punctuation, weighted by how far errors obscure meaning
+    scale: 1-5
+    anchors:
+      '1': errors in basic structures and spelling that repeatedly obscure meaning
+      '3': meaning stays clear, with recurring errors in complex structures, articles or prepositions
+      '5': few minor errors that never obscure meaning; spelling and punctuation are consistent

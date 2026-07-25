@@ -1,35 +1,16 @@
 import 'dotenv/config';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { parse } from 'yaml';
 import {
   runChecks,
   type CheckResult,
   type CheckSpec,
 } from '../checks/index.js';
 import { loadDataset, type DatasetItem } from '../dataset.js';
+import { loadRubric, type Rubric } from '../rubric.js';
 
 const DATASET = 'evals/dataset/train';
 const REPORTS = 'evals/reports';
-
-interface Rubric {
-  version: string;
-  deterministic: Array<{
-    id: string;
-    description: string;
-    params: Record<string, unknown>;
-  }>;
-  judge: Array<{
-    id: string;
-    weight: number;
-    description: string;
-    scale: string;
-  }>;
-}
-
-function loadRubric(): Rubric {
-  return parse(readFileSync('evals/rubric.yaml', 'utf8')) as Rubric;
-}
 
 function specsFor(rubric: Rubric, item: DatasetItem): CheckSpec[] {
   return rubric.deterministic.map((check) => ({
