@@ -18,6 +18,8 @@ evals/
   dataset/
     train/        development set
     test/         held out for the final run — do not touch
+  dataset.ts      dataset item (frontmatter + gold reference)
+  checks/         deterministic checks + registry (length, sections, banned)
   runners/        check execution (run.ts)
   reports/        run output (git-ignored)
 src/
@@ -35,13 +37,15 @@ npm install
 cp .env.example .env   # ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY
 npm run gen            # generate (tsx src/cli.ts)
 npm run eval           # run evals (tsx evals/runners/run.ts)
+npm test               # unit tests (vitest run)
 npm run typecheck      # tsc --noEmit
 npm run lint           # eslint
 npm run format         # prettier --write .
 ```
 
-`typecheck`, `lint`, and `format:check` must pass before a change is considered
-done — CI (`.github/workflows/ci.yml`) enforces the same three on every PR.
+`typecheck`, `lint`, `format:check`, and `test` must pass before a change is
+considered done — CI (`.github/workflows/ci.yml`) enforces the same four on
+every PR.
 
 ## Architecture principles
 
@@ -81,16 +85,22 @@ done — CI (`.github/workflows/ci.yml`) enforces the same three on every PR.
 
 ## Conventions
 
-**Language.** Everything committed is in English — code, identifiers, comments,
-docstrings, TODOs, error messages, docs, commit and PR text. The repository is
-public and read as international OSS. Exceptions: `prompts/` and
-`evals/dataset/` use the domain language (English here); `evals/rubric.yaml` may
-carry Polish CKE terms. Chat with the owner is in Russian, but none of it
-reaches the files.
+**Language.** Everything committed is in English — code, identifiers, error
+messages, docs, commit and PR text. The repository is public and read as
+international OSS. Exceptions: `prompts/` and `evals/dataset/` use the domain
+language (English here); `evals/rubric.yaml` may carry Polish CKE terms. Chat
+with the owner is in Russian, but none of it reaches the files.
+
+**No comments in code.** No inline comments, no docstrings, no TODOs. Names,
+types, and structure carry the intent; if something still needs explaining, it
+belongs in `docs/` or in the commit message.
 
 **Commits.** Conventional Commits, imperative mood
 (`feat: add deterministic length check`). Never commit or push without an
 explicit request.
+
+**Branches.** Never commit to `main` — it is the PR target. Work on a branch
+(`feat/...`, `fix/...`, `docs/...`) and merge through a PR.
 
 **Authorship.** This is a portfolio — the commit history must read as the
 owner's alone. The `Co-Authored-By` and "Generated with Claude Code" trailers
