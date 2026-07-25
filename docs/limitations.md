@@ -6,8 +6,12 @@
 - the corpus is empty — `evals/dataset/train/` and `test/` carry no labeled
   materials yet, so `npm run eval` has nothing to measure, and the gate over the
   corpus passes vacuously
-- the provenance of the materials is undecided, which blocks collection; see
+- the corpus will be self-authored, with its quality spread built by controlled
+  degradation, so variants of one base material are near-duplicates and
+  agreement measured across them reads optimistically; see
   `docs/labeling-protocol.md`
+- a single labeler assigns every score; until a second one joins, self-agreement
+  is the only check on drift
 - quality is judged by deterministic checks only; the LLM-judge and its
   calibration against human scores do not exist yet
 - `evals/rubric.yaml` follows the CKE scheme for poziom rozszerzony, but the
@@ -21,8 +25,8 @@
 
 ## Roadmap
 
-1. Decide the provenance of the materials, then collect a reference corpus
-   (20-30) and label it against the protocol
+1. Write the base materials, derive the graded variants, and label everything
+   against the protocol
 2. LLM-as-judge, calibrated against the human scores (QWK per dimension)
 3. Build out the steps: sections, assemble, revise
 4. RAG over the corpus

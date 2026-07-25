@@ -7,13 +7,16 @@ undocumented ground truth cannot be argued with, only believed.
 
 ## Status
 
-Two decisions are open and block collection:
+**Provenance — decided on 2026-07-25 by the repository owner.** Materials are
+self-authored, and the quality spread comes from controlled degradation of them
+(below). Nothing is taken from CKE sheets or from student work, so the corpus
+carries no licensing and no personal-data exposure.
 
-- **Provenance of the materials.** Not yet decided — see below.
-- **Who labels, and with what standing.** Not yet recorded.
-
-Fill both in before the first item is committed, and state in this file who
-decided what and when.
+**Who labels — still to be recorded.** The owner is the single labeler. What
+this file still needs is one sentence on the standing behind that: what makes
+these scores worth calibrating a judge against. Until a second labeler joins,
+the self-agreement pass below is the only check on drift, and it belongs in
+`docs/calibration.md` next to the judge's own numbers.
 
 ## Provenance and licensing
 
@@ -21,20 +24,31 @@ The repository is public, so every item ships under a licence someone can check.
 Each item declares its origin in the `source` field, and the parser rejects an
 item without one.
 
-Options, in the order they were considered:
+Options considered, and why the chosen one won:
 
-1. **Self-authored materials.** Written for this repository against the CKE task
-   formats. No licensing risk, full control over the quality spread, expensive
-   in time.
+1. **Self-authored materials — chosen.** Written for this repository against the
+   CKE task formats. No licensing risk, full control over the quality spread.
+   Expensive in time, and writing a convincingly weak answer is harder than
+   writing a strong one — which is what the degradation scheme below is for.
 2. **Public CKE samples** from the informator or published exam sheets, cited
-   precisely (edition, year, page). Requires reading the licence terms — the
-   fact that a document is publicly downloadable does not make redistribution
-   permitted.
-3. **Real student work.** Only with written consent and after anonymization.
-   Even without a name, an exam answer is personal data. Treat as a last resort.
+   precisely (edition, year, page). Rejected on two counts: publicly
+   downloadable does not mean redistributable without reading the licence, and
+   published sample answers are model answers, so they carry no quality spread.
+3. **Real student work.** Rejected: even anonymized, an exam answer is personal
+   data, and consent is a cost the project does not need to pay for the spread
+   it gets from degradation.
+4. **Model-generated materials.** Rejected as a basis. Cheap and easy to vary,
+   but models fail differently from learners — they rarely make the
+   L1-interference errors a Polish candidate makes, and instead produce fluent,
+   empty text. A judge calibrated on that measures agreement on a distribution
+   the exam does not contain.
 
-Whichever is chosen, `source` must be specific enough that a reader can verify
-the claim.
+`source` values follow one of two forms, so the origin of every item is
+machine-readable at a glance:
+
+- `self-authored` — a base material.
+- `self-authored, degraded from <base id>: <dimension>` — a variant, naming the
+  item it came from and the dimension the defect targets.
 
 ## Scale and anchors
 
@@ -63,6 +77,11 @@ For each item:
 Do not read the model output or a previous LLM-judge score before labeling.
 Ground truth contaminated by the system it is meant to test measures nothing.
 
+When the item is a degraded variant, do not open the base material's scores
+while scoring it. The base is an anchor you cannot un-see, and scores copied
+down from it record what you intended the defect to cost rather than what it
+actually cost.
+
 ## Self-agreement
 
 A single labeler still drifts. Before the final measurement, relabel a random
@@ -85,6 +104,35 @@ average hides exactly the case that would have taught something.
 - more than one `task_type`
 - a spread of quality, not only top answers — a corpus of fives cannot calibrate
   anything, since a judge that always answers 5 would score perfectly on it
+
+### Controlled degradation
+
+The spread is built, not collected. Write one strong material per task type,
+then derive variants from it by introducing one defect at a time:
+
+| Defect introduced                                                   | Dimension it targets |
+| ------------------------------------------------------------------- | -------------------- |
+| Drop a required element of the task, or drift off the brief         | `content`            |
+| Reorder paragraphs, strip the linking words                         | `coherence`          |
+| Replace varied lexis and structures with repetitive elementary ones | `range`              |
+| Introduce a systematic error class (articles, tenses, prepositions) | `accuracy`           |
+
+Two rules make this defensible rather than convenient:
+
+- **Score the variant on its own merits, not by arithmetic.** Knowing which
+  defect was introduced tells you which dimension to look at; it does not tell
+  you the number. Read the variant against the anchors as if you had not written
+  it, and expect a defect to move neighbouring dimensions too — text with the
+  connectives stripped often reads as thinner in `range` as well.
+- **`test/` shares no base material with `train/`.** A held-out item that is a
+  variant of a training item is not held out. Write the test bases separately,
+  on different topics.
+
+The variants of one base are near-duplicates of each other, so agreement
+measured across them is optimistic: the judge sees the same text repeatedly with
+one thing changed. Report this in `docs/calibration.md` alongside the numbers,
+and where it matters, report agreement over base materials separately from
+agreement over the full set.
 
 `npm test` gates the shape of what is committed — parsing, unique ids, a full
 set of scores, the deterministic layer on `train/` — but it does not enforce the
