@@ -21,7 +21,3 @@ export function getCheck(id: string): DeterministicCheck {
 export function runChecks(text: string, specs: CheckSpec[]): CheckResult[] {
   return specs.map((spec) => getCheck(spec.id)(text, spec.params));
 }
-
-export * from './types.js';
-export { countWords } from './length.js';
-export { extractSections } from './sections.js';

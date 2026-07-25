@@ -1,10 +1,10 @@
 import 'dotenv/config';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { CheckResult } from '../checks/index.js';
-import { loadDataset, type DatasetItem } from '../dataset.js';
-import { loadRubric } from '../rubric.js';
-import { evaluateItem } from '../specs.js';
+import type { CheckResult } from './checks/types.js';
+import { loadDataset, type DatasetItem } from './dataset.js';
+import { loadRubric } from './rubric.js';
+import { evaluateItem } from './specs.js';
 
 const DATASET = 'evals/dataset/train';
 const REPORTS = 'evals/reports';

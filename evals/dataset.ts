@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { CheckParams } from './checks/index.js';
+import type { CheckParams } from './checks/types.js';
 import { fail, parseYaml, requireMap, requireString } from './yaml.js';
 
 export interface DatasetItem {
