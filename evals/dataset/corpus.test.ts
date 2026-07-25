@@ -1,8 +1,8 @@
 import { basename } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { loadDataset, type DatasetItem } from './dataset.js';
-import { loadRubric } from './rubric.js';
-import { checkSpecsFor, evaluateItem } from './specs.js';
+import { loadDataset, type DatasetItem } from '../dataset.js';
+import { loadRubric } from '../rubric.js';
+import { checkSpecsFor, evaluateItem } from '../specs.js';
 
 const TRAIN = 'evals/dataset/train';
 const HELD_OUT = 'evals/dataset/test';

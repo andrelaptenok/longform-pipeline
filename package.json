@@ -27,7 +27,7 @@
   },
   "scripts": {
     "gen": "tsx src/cli.ts",
-    "eval": "tsx evals/runners/run.ts",
+    "eval": "tsx evals/run.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

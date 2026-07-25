@@ -24,7 +24,7 @@ evals/
   specs.ts        rubric defaults + item overrides -> checks to run
   yaml.ts         shared YAML parsing and validation helpers
   checks/         deterministic checks + registry (length, sections, banned)
-  runners/        check execution (run.ts)
+  run.ts          check execution for `npm run eval`
   reports/        run output (git-ignored)
 src/
   cli.ts          entry point for `npm run gen`
@@ -35,7 +35,8 @@ docs/             architecture, decisions, limitations, labeling protocol
 ```
 
 Tests are not in the tree because they are never apart from it: a module is
-covered by `<module>.test.ts` next to it.
+covered by `<module>.test.ts` next to it, and the committed corpus by
+`dataset/corpus.test.ts` next to the items it gates.
 
 ## Commands
 
@@ -102,12 +103,13 @@ with the owner is in Russian, but none of it reaches the files.
 types, and structure carry the intent; if something still needs explaining, it
 belongs in `docs/` or in the commit message.
 
-**Layout.** A test sits next to the module it covers
-(`checks/length.ts` → `checks/length.test.ts`), never in a separate tree. A
-directory appears when interchangeable units need a registry to pick between
-them (`evals/checks/`); a single responsibility stays a single file at the top
-of its area (`evals/yaml.ts`). A module that reads a directory of data sits
-beside it, sharing its name (`evals/dataset.ts` and `evals/dataset/`).
+**Layout.** A test sits next to what it covers, never in a separate tree: a
+module (`checks/length.ts` → `checks/length.test.ts`), or, when it gates data
+rather than code, the data (`evals/dataset/corpus.test.ts`). A directory appears
+when interchangeable units need a registry to pick between them
+(`evals/checks/`); a single responsibility stays a single file at the top of its
+area (`evals/yaml.ts`, `evals/run.ts`). A module that reads a directory of data
+sits beside it, sharing its name (`evals/dataset.ts` and `evals/dataset/`).
 
 **Commits.** Conventional Commits, imperative mood
 (`feat: add deterministic length check`). Never commit or push without an

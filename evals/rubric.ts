@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import type { CheckParams } from './checks/index.js';
+import type { CheckParams } from './checks/types.js';
 import {
   asRecord,
   fail,

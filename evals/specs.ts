@@ -1,9 +1,5 @@
-import {
-  runChecks,
-  type CheckParams,
-  type CheckResult,
-  type CheckSpec,
-} from './checks/index.js';
+import { runChecks } from './checks/index.js';
+import type { CheckParams, CheckResult, CheckSpec } from './checks/types.js';
 import type { DatasetItem } from './dataset.js';
 import type { Rubric, RubricCheck } from './rubric.js';
 import { fail } from './yaml.js';
