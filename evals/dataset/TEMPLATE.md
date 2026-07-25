@@ -1,0 +1,34 @@
+---
+id: informal-email-01
+task_type: informal_email
+brief: 'Write an informal email to a friend about a trip you took.'
+source: self-authored
+expected:
+  length: { min_words: 200, max_words: 250 }
+  sections_present: { required: [greeting, body, closing] }
+human_scores: { content: 5, coherence: 4, range: 4, accuracy: 5 }
+---
+
+The gold reference material goes here — the full text a top answer would look
+like, in the format the brief asks for.
+
+Copy this file into `train/` (or `test/`, for the held-out set) under a name
+that matches its `id` — the corpus gate checks that they agree. Every field above is required except `expected` and
+`human_scores`, and both are needed before an item counts as labeled:
+
+- `source` — where the material came from. `self-authored`, or a citation
+  precise enough to check the licence: this repository is public.
+- `expected` — per-check overrides, keyed by check id, layered over the
+  defaults in `rubric.yaml`. Drop a key to keep the default; a key that names no
+  check, or a param that check does not have, is an error rather than a shrug.
+  A list replaces the default list instead of extending it, so
+  `banned_constructions: { patterns: [] }` disables the check for this item —
+  write it only when that is what you mean.
+- `human_scores` — the expert scores, one per judge dimension in `rubric.yaml`,
+  each 1 to 5, assigned against the anchors there. This is the ground truth the
+  LLM-judge is calibrated against, so it is scored by a person reading the
+  anchors, never by a model.
+
+`docs/labeling-protocol.md` describes how the scores are assigned. `npm test`
+checks that every committed item parses, carries a full set of scores, and — in
+`train/` — passes the deterministic layer.
