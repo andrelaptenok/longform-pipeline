@@ -14,9 +14,11 @@
   is the only check on drift
 - quality is judged by deterministic checks only; the LLM-judge and its
   calibration against human scores do not exist yet
-- `evals/rubric.yaml` follows the CKE scheme for poziom rozszerzony, but the
-  point split and the word range still have to be verified against the current
-  informator
+- `evals/rubric.yaml` follows the CKE scheme for poziom rozszerzony. The point
+  split (5/2/3/3 = 13) and the 200-250 word range were checked on 2026-07-26
+  against secondary sources that reproduce the criteria; the informator itself
+  has not been read, and how a response outside the word range is scored is
+  still unknown — the length check treats it as a plain fail
 - RAG is not wired in
 - a single provider (Anthropic); its pricing is hardcoded next to the model id
   in `getProvider` and has to be updated by hand when either changes
