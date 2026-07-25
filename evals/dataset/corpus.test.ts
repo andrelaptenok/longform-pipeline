@@ -88,6 +88,19 @@ describe('the committed corpus', () => {
     }
   });
 
+  it('respects the CKE gate: a material that misses the task scores low everywhere', () => {
+    const rubric = loadRubric();
+    const gate = rubric.judge[0];
+    const others = rubric.judge.slice(1).map((dimension) => dimension.id);
+
+    for (const item of corpus()) {
+      if (!gate || item.humanScores[gate.id] !== 1) continue;
+
+      const above = others.filter((id) => (item.humanScores[id] ?? 1) > 1);
+      expect(above, `${where(item)} scores 1 on ${gate.id}`).toEqual([]);
+    }
+  });
+
   it('resolves every check override against the rubric', () => {
     const rubric = loadRubric();
 
