@@ -6,8 +6,9 @@ source: self-authored
 ---
 
 Every September another school announces that its pupils will carry a tablet
-instead of a bag full of books. In my opinion the change brings real gains, but
-only where a school can afford to make it properly.
+instead of a bag full of books. The decision has convinced supporters and
+determined opponents alike, and both can point to consequences worth weighing:
+what it does to learning, and what it costs.
 
 The first question is what happens to learning itself. A tablet puts an entire
 library into a pupil's hands: a difficult passage can be looked up, listened to
@@ -19,8 +20,8 @@ it, never offered that temptation.
 
 The second question is money, and here the picture is less encouraging.
 Textbooks are bought once and passed down for years, while tablets are replaced
-every few years, break when dropped, and demand a network that many buildings
-still do not have. A family that cannot afford a repair is quietly left behind,
+every few years, break when dropped, and demand a network many buildings still
+lack. A family that cannot afford a repair is quietly left behind,
 which is not a difficulty a printed book ever created.
 
 I therefore believe that tablets belong in schools as an addition rather than a

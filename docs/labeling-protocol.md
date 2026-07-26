@@ -121,6 +121,15 @@ average hides exactly the case that would have taught something.
 - a spread of quality, not only top answers — a corpus of fives cannot calibrate
   anything, since a judge that always answers 5 would score perfectly on it
 
+### One deliberate departure from the exam
+
+CKE sets the topic in Polish; `brief` is written in English, because everything
+committed here is in English and the brief is read by the pipeline and the judge
+rather than by a candidate. What is being scored — the response, the criteria,
+the anchors — is unaffected. If a future comparison against real exam conditions
+needs the Polish wording, it belongs in a second field, not in place of this
+one.
+
 ### Drafts
 
 An unlabeled material is not yet an item. Materials wait in

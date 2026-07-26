@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { basename } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDataset, type DatasetItem } from '../dataset.js';
@@ -11,6 +12,8 @@ const DRAFTS = 'evals/dataset/drafts';
 const train = () => loadDataset(TRAIN);
 const heldOut = () => loadDataset(HELD_OUT);
 const corpus = () => [...loadDataset(TRAIN), ...loadDataset(HELD_OUT)];
+const drafts = () => (existsSync(DRAFTS) ? loadDataset(DRAFTS) : []);
+const everything = () => [...corpus(), ...drafts()];
 
 const where = (item: DatasetItem) => `${item.file} (${item.id})`;
 const familyOf = (item: DatasetItem) => item.derivedFrom ?? item.id;
@@ -21,13 +24,13 @@ describe('the committed corpus', () => {
     expect(() => loadDataset(HELD_OUT)).not.toThrow();
   });
 
-  it('gives every item a unique id', () => {
-    const ids = corpus().map((item) => item.id);
+  it('gives every item a unique id, drafts included', () => {
+    const ids = everything().map((item) => item.id);
     expect(ids).toEqual([...new Set(ids)]);
   });
 
-  it('names every file after the id it carries', () => {
-    for (const item of corpus()) {
+  it('names every file after the id it carries, drafts included', () => {
+    for (const item of everything()) {
       expect(basename(item.file, '.md'), where(item)).toBe(item.id);
     }
   });
@@ -115,7 +118,7 @@ describe('the drafts', () => {
   it('parse and pass the deterministic layer, so labeling is all that is left', () => {
     const rubric = loadRubric();
 
-    for (const item of loadDataset(DRAFTS)) {
+    for (const item of drafts()) {
       const failed = evaluateItem(rubric, item)
         .filter((result) => !result.pass)
         .map((result) => `${result.id}: ${result.detail}`);
