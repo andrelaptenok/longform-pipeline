@@ -6,8 +6,9 @@ source: self-authored
 ---
 
 Whenever a city announces that its centre will be closed to private cars, the
-argument that follows is louder than the traffic ever was. I am convinced the
-policy is right, though it is often introduced in the wrong order.
+argument that follows is louder than the traffic ever was. Supporters and
+opponents both have a case, and it is worth setting the two side by side: what
+the policy does to the people who live there, and to the shops that serve them.
 
 For residents the gains are immediate and physical. Air that was measurably
 harmful becomes breathable, a street that was a corridor becomes a place where
@@ -19,8 +20,8 @@ problem in exchange for a general good.
 
 Shopkeepers usually protest first and benefit most. Their fear is reasonable:
 customers who arrive by car spend more per visit, and a builder's merchant
-cannot deliver bathroom tiles by bicycle. Yet the evidence from cities that have
-already done this points the other way. Streets without cars attract people who
+cannot deliver bathroom tiles by bicycle. Yet evidence from cities that have already
+done it points the other way. Streets without cars attract people who
 stay, and a customer who walks past a window twice a day eventually comes in.
 
 The policy therefore works, but only when the alternatives arrive first. Close a

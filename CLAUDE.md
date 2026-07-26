@@ -116,8 +116,10 @@ area (`evals/yaml.ts`, `evals/run.ts`). A module that reads a directory of data
 sits beside it, sharing its name (`evals/dataset.ts` and `evals/dataset/`).
 
 **Commits.** Conventional Commits, imperative mood
-(`feat: add deterministic length check`). Never commit or push without an
-explicit request.
+(`feat: add deterministic length check`). One project-specific type on top of
+the standard set: `corpus:` for changes that add or relabel dataset materials,
+since those change data rather than behaviour and are read differently in the
+history. Never commit or push without an explicit request.
 
 **Branches.** Never commit to `main` — it is the PR target. Work on a branch
 (`feat/...`, `fix/...`, `docs/...`) and merge through a PR.
