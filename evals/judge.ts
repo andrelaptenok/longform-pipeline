@@ -132,7 +132,7 @@ export async function judgeItem(
   item: DatasetItem,
   options: JudgeOptions = {},
 ): Promise<JudgeVerdict> {
-  const version = options.version ?? 'v1';
+  const version = options.version ?? 'v2';
   const attempts = options.attempts ?? 2;
   const prompt = loadPrompt('judge', version);
   const system = `${prompt.body}\n\n${renderRubric(rubric)}`;

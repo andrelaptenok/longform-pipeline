@@ -193,7 +193,7 @@ describe('judgeItem', () => {
 
     expect(verdict).toMatchObject({
       itemId: 'article-01',
-      promptVersion: 'judge.v1',
+      promptVersion: 'judge.v2',
       rubricVersion: 'v1',
     });
     expect(verdict.scores.content?.score).toBe(4);

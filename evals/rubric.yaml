@@ -1,4 +1,4 @@
-version: v1
+version: v2
 
 source:
   name: CKE, wypowiedź pisemna, poziom rozszerzony, Formuła 2023
@@ -10,7 +10,7 @@ source:
   length_scored: 180-280 words, the band that earns the length element of zgodność z poleceniem
   length_floor: below 160 words only zgodność z poleceniem is scored; every other criterion is 0 and errors are not marked
   dependencies: zgodność z poleceniem 0 forces every other criterion to 0; zgodność z poleceniem 1 caps every other criterion at 1
-  weights: judge weights are the CKE point maxima; every dimension is still scored on the same 1-5 scale
+  weights: judge weights are the CKE point maxima; every dimension is still scored on the same 0-5 scale
   checked: 2026-07-26 against the informator itself
   verify: re-read when CKE publishes a new edition of the informator
 
@@ -40,8 +40,9 @@ judge:
     cke_name: zgodność z poleceniem
     weight: 5
     description: every element of the task is covered and developed, in the required format and register
-    scale: 1-5
+    scale: 0-5
     anchors:
+      '0': the task is not realised at all; a different task is answered, or almost nothing the task asked for is delivered
       '1': fewer than half the required elements are addressed, or the text drifts off the brief; a reader would not get what the task asked for
       '3': all required elements appear, but some are only named rather than developed; occasional padding or an off-topic passage
       '5': every element is present and developed, in the required format and register, with nothing off-brief
@@ -50,8 +51,9 @@ judge:
     cke_name: spójność i logika wypowiedzi
     weight: 2
     description: the text reads as one line of thought, carried by paragraphing and cohesive devices
-    scale: 1-5
+    scale: 0-5
     anchors:
+      '0': there is no line of thought to follow; sentences and paragraphs do not connect at all. Also assigned when content scores 0, or the response is under 160 words
       '1': no visible progression; paragraphs are unordered and linking words are missing or misused, so the reader has to reconstruct the argument
       '3': the overall structure holds, but transitions are mechanical or one paragraph breaks the line of thought
       '5': a clear line from opening to closing; paragraphing and cohesive devices carry the reader without effort
@@ -60,8 +62,9 @@ judge:
     cke_name: zakres środków językowych
     weight: 3
     description: variety and precision of vocabulary and grammatical structures at the level the task expects
-    scale: 1-5
+    scale: 0-5
     anchors:
+      '0': there is hardly any language to judge; a few memorised phrases far below the level of the task. Also assigned when content scores 0, or the response is under 160 words
       '1': elementary repetitive vocabulary and one or two sentence patterns, below the level of the task
       '3': adequate range with some variation, but reliant on common phrases and short of precise or idiomatic choices
       '5': varied and precise lexis and structures suited to the level and register, used naturally rather than for display
@@ -70,8 +73,9 @@ judge:
     cke_name: poprawność środków językowych
     weight: 3
     description: grammar, lexis, spelling and punctuation, weighted by how far errors obscure meaning
-    scale: 1-5
+    scale: 0-5
     anchors:
+      '0': nearly every sentence carries errors and meaning has to be guessed at throughout. Also assigned when content scores 0, or the response is under 160 words
       '1': errors in basic structures and spelling that repeatedly obscure meaning
       '3': meaning stays clear, with recurring errors in complex structures, articles or prepositions
       '5': few minor errors that never obscure meaning; spelling and punctuation are consistent
