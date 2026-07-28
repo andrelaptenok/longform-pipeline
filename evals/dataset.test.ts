@@ -42,7 +42,44 @@ describe('parseDatasetItem', () => {
     const item = parseDatasetItem(minimal, 'item.md');
 
     expect(item.expected).toEqual({});
+    expect(item.expectedFailures).toEqual([]);
     expect(item.humanScores).toEqual({});
+  });
+
+  it('reads the deterministic checks a degraded item is meant to fail', () => {
+    const variant = parseDatasetItem(
+      '---\nid: a\ntask_type: t\nbrief: b\nsource: s\nexpected_failures: [length, sections_present]\n---\ntext',
+      'a.md',
+    );
+
+    expect(variant.expectedFailures).toEqual(['length', 'sections_present']);
+  });
+
+  it('rejects expected_failures that is not a list of check ids', () => {
+    expect(() =>
+      parseDatasetItem(
+        '---\nid: a\ntask_type: t\nbrief: b\nsource: s\nexpected_failures: length\n---\ntext',
+        'x.md',
+      ),
+    ).toThrow(/x\.md: expected_failures must be a list of check ids/);
+
+    expect(() =>
+      parseDatasetItem(
+        '---\nid: a\ntask_type: t\nbrief: b\nsource: s\nexpected_failures: [1]\n---\ntext',
+        'x.md',
+      ),
+    ).toThrow(
+      /x\.md: expected_failures must list check ids as non-empty strings/,
+    );
+  });
+
+  it('rejects a check declared as failing twice', () => {
+    expect(() =>
+      parseDatasetItem(
+        '---\nid: a\ntask_type: t\nbrief: b\nsource: s\nexpected_failures: [length, length]\n---\ntext',
+        'x.md',
+      ),
+    ).toThrow(/x\.md: expected_failures lists "length" twice/);
   });
 
   it('names the file when frontmatter is missing', () => {

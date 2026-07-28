@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { loadDataset, type DatasetItem } from '../dataset.js';
 import { loadRubric } from '../rubric.js';
 import { scaleBoundsOf } from '../judge.js';
-import { checkSpecsFor, evaluateItem } from '../specs.js';
+import { checkSpecsFor, deviations, evaluateItem } from '../specs.js';
 
 const TRAIN = 'evals/dataset/train';
 const HELD_OUT = 'evals/dataset/test';
@@ -138,15 +138,12 @@ describe('the committed corpus', () => {
 });
 
 describe('the drafts', () => {
-  it('parse and pass the deterministic layer, so labeling is all that is left', () => {
+  it('parse and meet the deterministic layer, so labeling is all that is left', () => {
     const rubric = loadRubric();
 
     for (const item of drafts()) {
-      const failed = evaluateItem(rubric, item)
-        .filter((result) => !result.pass)
-        .map((result) => `${result.id}: ${result.detail}`);
-
-      expect(failed, where(item)).toEqual([]);
+      const off = deviations(item, evaluateItem(rubric, item));
+      expect(off, where(item)).toEqual([]);
     }
   });
 });
@@ -163,15 +160,12 @@ describe('the split between train and test', () => {
 });
 
 describe('the training split', () => {
-  it('passes the deterministic layer on every item', () => {
+  it('fails no deterministic check it did not declare, and declares none it passes', () => {
     const rubric = loadRubric();
 
     for (const item of train()) {
-      const failed = evaluateItem(rubric, item)
-        .filter((result) => !result.pass)
-        .map((result) => `${result.id}: ${result.detail}`);
-
-      expect(failed, where(item)).toEqual([]);
+      const off = deviations(item, evaluateItem(rubric, item));
+      expect(off, where(item)).toEqual([]);
     }
   });
 });

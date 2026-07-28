@@ -139,12 +139,28 @@ one.
 An unlabeled material is not yet an item. Materials wait in
 `evals/dataset/drafts/` until they carry `human_scores`, and a labeler moves a
 file into `train/` or `test/` at the moment it is scored — the split it lands in
-is part of the labeling decision. The gate checks that drafts parse and pass the
-deterministic layer, so what is left to do to one is exactly the scoring.
+is part of the labeling decision. The gate checks that drafts parse and that the
+deterministic layer says about them what they declare, so what is left to do to
+one is exactly the scoring.
 
 Writing a material and scoring it are separate jobs, and a draft written by
 somebody else is easier to score honestly than one written by the labeler an
 hour earlier.
+
+### Declaring a deliberate failure
+
+The deterministic layer is a floor: parsing, length, required sections, banned
+constructions. A degraded variant sometimes has to break that floor to be the
+material it is meant to be — a response under 160 words, or one written in the
+wrong format — and an item that silently fails a check is indistinguishable from
+one that was written badly by accident.
+
+Such an item lists the check ids it is meant to fail in `expected_failures`, and
+the gate then requires exactly that: a failure it did not declare is an error,
+and a declared failure that passes means the defect did not land. Do not reach
+for an `expected` override instead — an override changes what the check asks of
+this item and hides the defect, while a declaration leaves the check running and
+its verdict in the report.
 
 ### Controlled degradation
 
@@ -178,9 +194,9 @@ agreement over the full set.
 
 `npm test` gates the shape of what is committed — parsing, unique ids, a full
 set of scores within the scale each dimension declares, the CKE gate on those
-scores, and the deterministic layer on `train/` — but it does not enforce the
-counts or the spread, because it would then fail from the first day of
-collection to the last. Check both by hand before the calibration run, and say
+scores, and the deterministic layer on `train/` against what each item declares
+— but it does not enforce the counts or the spread, because it would then fail
+from the first day of collection to the last. Check both by hand before the calibration run, and say
 in `docs/calibration.md` what the corpus actually contained.
 
 ## Versioning

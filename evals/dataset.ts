@@ -10,6 +10,7 @@ export interface DatasetItem {
   source: string;
   derivedFrom: string | null;
   expected: Record<string, CheckParams>;
+  expectedFailures: string[];
   humanScores: Record<string, number>;
   reference: string;
   file: string;
@@ -27,6 +28,28 @@ function readExpected(raw: unknown, file: string): Record<string, CheckParams> {
   }
 
   return expected;
+}
+
+function readExpectedFailures(raw: unknown, file: string): string[] {
+  if (raw === undefined) return [];
+
+  if (!Array.isArray(raw)) {
+    fail(file, 'expected_failures must be a list of check ids');
+  }
+
+  const ids = raw.map((entry) => {
+    if (typeof entry !== 'string' || entry.trim().length === 0) {
+      fail(file, 'expected_failures must list check ids as non-empty strings');
+    }
+    return entry;
+  });
+
+  const duplicate = ids.find((id, index) => ids.indexOf(id) !== index);
+  if (duplicate !== undefined) {
+    fail(file, `expected_failures lists "${duplicate}" twice`);
+  }
+
+  return ids;
 }
 
 function readHumanScores(raw: unknown, file: string): Record<string, number> {
@@ -79,6 +102,7 @@ export function parseDatasetItem(source: string, file: string): DatasetItem {
     source: requireString(meta, 'source', file),
     derivedFrom: readDerivedFrom(meta.derived_from, id, file),
     expected: readExpected(meta.expected, file),
+    expectedFailures: readExpectedFailures(meta.expected_failures, file),
     humanScores: readHumanScores(meta.human_scores, file),
     reference,
     file,

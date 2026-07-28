@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseDatasetItem } from './dataset.js';
 import { parseRubric } from './rubric.js';
-import { checkSpecsFor, evaluateItem } from './specs.js';
+import { checkSpecsFor, deviations, evaluateItem } from './specs.js';
 
 const RUBRIC = parseRubric(
   `
@@ -75,6 +75,14 @@ describe('checkSpecsFor', () => {
     );
   });
 
+  it('rejects a declared failure for a check the rubric does not list', () => {
+    expect(() =>
+      checkSpecsFor(RUBRIC, item('expected_failures: [sections_present]\n')),
+    ).toThrow(
+      /item\.md: expected_failures names sections_present, which is not a check in the rubric \(known: length, banned_constructions\)/,
+    );
+  });
+
   it('replaces a list param rather than extending it', () => {
     const specs = checkSpecsFor(
       RUBRIC,
@@ -95,6 +103,35 @@ describe('evaluateItem', () => {
     expect(results.map((result) => [result.id, result.pass])).toEqual([
       ['length', true],
       ['banned_constructions', false],
+    ]);
+  });
+});
+
+describe('deviations', () => {
+  const short = 'expected:\n  length: { min_words: 1, max_words: 10 }\n';
+
+  it('reports a failure the item did not declare', () => {
+    const material = item(short);
+
+    expect(deviations(material, evaluateItem(RUBRIC, material))).toEqual([
+      'banned_constructions: banned patterns matched: \\bgonna\\b',
+    ]);
+  });
+
+  it('says nothing about a failure the item declared', () => {
+    const material = item(
+      `${short}expected_failures: [banned_constructions]\n`,
+    );
+
+    expect(deviations(material, evaluateItem(RUBRIC, material))).toEqual([]);
+  });
+
+  it('reports a declared failure that did not happen', () => {
+    const material = item(`${short}expected_failures: [length]\n`);
+
+    expect(deviations(material, evaluateItem(RUBRIC, material))).toEqual([
+      'length: declared in expected_failures, but it passed',
+      'banned_constructions: banned patterns matched: \\bgonna\\b',
     ]);
   });
 });
