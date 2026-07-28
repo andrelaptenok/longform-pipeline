@@ -147,6 +147,13 @@ Writing a material and scoring it are separate jobs, and a draft written by
 somebody else is easier to score honestly than one written by the labeler an
 hour earlier.
 
+A base material is labeled and moved before any variant derived from it. The
+gate resolves `derived_from` within the corpus, so a variant that arrives while
+its base is still a draft has nothing to point at and fails — the family rule
+between the splits cannot mean anything while half the family sits outside both.
+Scoring a variant first is fine and often better; it is the move into `train/`
+or `test/` that has to wait for the base.
+
 ### Declaring a deliberate failure
 
 The deterministic layer is a floor: parsing, length, required sections, banned
@@ -211,5 +218,21 @@ labeled against `v1`, so no relabeling was owed.
 
 ## Labeling notes
 
-Items whose scoring was not obvious, with the reasoning. Empty until collection
-begins.
+Items whose scoring was not obvious, with the reasoning.
+
+**`essay-tablets-short`, 2026-07-29.** At 113 words the material is under the
+CKE floor of 160, so `coherence`, `range` and `accuracy` are 0 by rule rather
+than by reading: the text itself is written at the level of the base it was
+derived from, and a reader who meets three zeros next to a competent paragraph
+will otherwise assume the labeler slipped. Only `content` was scored against the
+anchors, and the length shortfall counts inside it, since length is an element
+of `zgodność z poleceniem` rather than a criterion of its own.
+
+The variant was scored before the base it comes from, which is the order the
+protocol asks for — the base was not open while the variant was read.
+
+Both items are the first in `train/`, so three of the four dimensions there now
+carry a score no one judged. `docs/calibration.md` has to report agreement on
+`coherence`, `range` and `accuracy` separately for items where the dimension was
+actually read and for items where the floor rule set it, or the judge will be
+credited for counting words.
