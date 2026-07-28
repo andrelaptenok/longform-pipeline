@@ -113,7 +113,7 @@ describe('the committed rubric', () => {
 
   it('anchors every dimension at the ends of the scale', () => {
     for (const dimension of loadRubric().judge) {
-      expect(Object.keys(dimension.anchors)).toEqual(['1', '3', '5']);
+      expect(Object.keys(dimension.anchors)).toEqual(['0', '1', '3', '5']);
     }
   });
 

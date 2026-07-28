@@ -57,9 +57,11 @@ family is always a base and the variants hanging off it.
 ## Scale and anchors
 
 Dimensions, weights and anchors live in `evals/rubric.yaml`: `content`,
-`coherence`, `range`, `accuracy`, each scored 1 to 5 against the anchors written
-for 1, 3 and 5. Scores 2 and 4 mean "between these two anchors" — do not invent
-criteria for them.
+`coherence`, `range`, `accuracy`, each scored 0 to 5 against the anchors written
+for 0, 1, 3 and 5. Scores 2 and 4 mean "between these two anchors" — do not
+invent criteria for them. Zero is a band with an anchor of its own, not a way of
+writing "very weak": use it when the material matches that anchor, or when one
+of the two CKE rules below forces it.
 
 The rubric is the only reference. If an item cannot be scored from the anchors,
 the anchors are wrong: fix them in a new rubric version and relabel, rather than
@@ -75,7 +77,9 @@ Three CKE rules sit outside the anchors and apply before them:
   dimension goes above 1. A material that misses the task cannot score well on
   range or accuracy, however well written it is.
 
-These are recorded in `evals/rubric.yaml` under `source`.
+These are recorded in `evals/rubric.yaml` under `source`, and both halves of the
+gate are executable: `npm test` checks that a corpus item scoring 0 or 1 on
+`content` respects the cap on every other dimension.
 
 ## Procedure
 
@@ -173,7 +177,8 @@ and where it matters, report agreement over base materials separately from
 agreement over the full set.
 
 `npm test` gates the shape of what is committed — parsing, unique ids, a full
-set of scores, the deterministic layer on `train/` — but it does not enforce the
+set of scores within the scale each dimension declares, the CKE gate on those
+scores, and the deterministic layer on `train/` — but it does not enforce the
 counts or the spread, because it would then fail from the first day of
 collection to the last. Check both by hand before the calibration run, and say
 in `docs/calibration.md` what the corpus actually contained.
@@ -183,6 +188,10 @@ in `docs/calibration.md` what the corpus actually contained.
 Relabeling an item is a commit that says why. Changing the anchors means a new
 `rubric.yaml` version and relabeling everything scored against the old ones —
 scores from two different rubrics must never sit in one corpus.
+
+`v2` widened the scale from 1-5 to 0-5 and added the anchor for 0, so that the
+two CKE rules above can be recorded rather than only described. Nothing had been
+labeled against `v1`, so no relabeling was owed.
 
 ## Labeling notes
 

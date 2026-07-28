@@ -3,6 +3,7 @@ import { basename } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDataset, type DatasetItem } from '../dataset.js';
 import { loadRubric } from '../rubric.js';
+import { scaleBoundsOf } from '../judge.js';
 import { checkSpecsFor, evaluateItem } from '../specs.js';
 
 const TRAIN = 'evals/dataset/train';
@@ -54,13 +55,22 @@ describe('the committed corpus', () => {
   });
 
   it('keeps every human score an integer within the rubric scale', () => {
+    const bounds = new Map(
+      loadRubric().judge.map((dimension) => [
+        dimension.id,
+        scaleBoundsOf(dimension),
+      ]),
+    );
+
     for (const item of corpus()) {
       for (const [dimension, score] of Object.entries(item.humanScores)) {
-        expect(Number.isInteger(score), `${where(item)} ${dimension}`).toBe(
-          true,
-        );
-        expect(score, `${where(item)} ${dimension}`).toBeGreaterThanOrEqual(1);
-        expect(score, `${where(item)} ${dimension}`).toBeLessThanOrEqual(5);
+        const scale = bounds.get(dimension);
+        const label = `${where(item)} ${dimension}`;
+
+        expect(scale, label).toBeDefined();
+        expect(Number.isInteger(score), label).toBe(true);
+        expect(score, label).toBeGreaterThanOrEqual(scale?.min ?? 0);
+        expect(score, label).toBeLessThanOrEqual(scale?.max ?? 0);
       }
     }
   });
@@ -102,6 +112,19 @@ describe('the committed corpus', () => {
 
       const above = others.filter((id) => (item.humanScores[id] ?? 1) > 1);
       expect(above, `${where(item)} scores 1 on ${gate.id}`).toEqual([]);
+    }
+  });
+
+  it('respects the CKE gate: a material that fails the task scores zero everywhere', () => {
+    const rubric = loadRubric();
+    const gate = rubric.judge[0];
+    const others = rubric.judge.slice(1).map((dimension) => dimension.id);
+
+    for (const item of corpus()) {
+      if (!gate || item.humanScores[gate.id] !== 0) continue;
+
+      const above = others.filter((id) => (item.humanScores[id] ?? 0) !== 0);
+      expect(above, `${where(item)} scores 0 on ${gate.id}`).toEqual([]);
     }
   });
 

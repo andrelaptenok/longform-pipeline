@@ -15,13 +15,15 @@
 - the LLM-judge runs and its agreement with a human can be computed, but nothing
   has been measured: with no corpus there is no calibration, no prompt
   iteration, and no threshold that says whether the judge is ready
-- the judge scores each dimension independently; CKE's gate (see below) is
-  checked on human scores in the corpus gate but not applied to judge output
+- the CKE gate is asked of the judge in `prompts/judge.v2.md` and checked on
+  human scores by the corpus gate, but nothing enforces it on judge output: a
+  verdict that scores `content` 0 and `range` 4 is accepted and calibrated as
+  it stands. Aggregating judge scores into a total will have to apply the gate
+  in code, or the total will read higher than CKE's would
 - `evals/rubric.yaml` matches the CKE informator for poziom rozszerzony, checked
-  against it on 2026-07-26. What the rubric does not model is CKE's dependency
-  between criteria: a `zgodność z poleceniem` of 0 forces every other criterion
-  to 0, and a 1 caps them at 1. Aggregating judge scores into a total will have
-  to account for that, or the total will read higher than CKE's would
+  against it on 2026-07-26. The scale is 0-5 per dimension, while CKE's own
+  maxima differ by criterion (5 / 2 / 3 / 3); the point split lives in the
+  weights instead, so a dimension can be scored 5 where CKE would cap it at 2
 - RAG is not wired in
 - a single provider (Anthropic); its pricing is hardcoded next to the model id
   in `getProvider` and has to be updated by hand when either changes
@@ -50,5 +52,8 @@
 - the scaffold for collection: an item template, a labeling protocol, and a
   test that gates every committed item on parsing, a full set of human scores,
   and the deterministic layer
+- the 0-5 scale of the CKE scheme, so that a response which fails the task can
+  be recorded as CKE would record it, with the gate between criteria executable
+  on both 0 and 1
 - the LLM-judge, the agreement metrics (QWK, MAE, exact, within 1, Spearman)
   and the calibration that pairs judge scores with expert ones per dimension
