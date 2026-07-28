@@ -3,6 +3,7 @@ id: essay-tablets
 task_type: essay
 brief: 'Some schools are replacing printed textbooks with tablets. Write an essay in which you present the advantages and disadvantages of this change. Discuss two elements: the effect on how students learn, and the costs the change creates for schools and families.'
 source: self-authored
+human_scores: { content: 5, coherence: 5, range: 5, accuracy: 5 }
 ---
 
 Every September another school announces that its pupils will carry a tablet
