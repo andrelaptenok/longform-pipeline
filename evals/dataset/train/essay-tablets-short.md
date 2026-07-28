@@ -5,6 +5,7 @@ brief: 'Some schools are replacing printed textbooks with tablets. Write an essa
 source: 'self-authored, degraded from essay-tablets: content'
 derived_from: essay-tablets
 expected_failures: [length]
+human_scores: { content: 2, coherence: 0, range: 0, accuracy: 0 }
 ---
 
 Many schools now give tablets to their pupils instead of printed books, and the
