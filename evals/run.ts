@@ -8,7 +8,7 @@ import { calibrate, type DimensionCalibration } from './calibration.js';
 import { loadDataset, type DatasetItem } from './dataset.js';
 import { judgeItem, type JudgeVerdict } from './judge.js';
 import { loadRubric, type Rubric } from './rubric.js';
-import { evaluateItem } from './specs.js';
+import { deviations, evaluateItem } from './specs.js';
 
 const DATASET = 'evals/dataset/train';
 const REPORTS = 'evals/reports';
@@ -19,13 +19,21 @@ interface JudgeFailure {
   error: string;
 }
 
-function report(item: DatasetItem, results: CheckResult[]): void {
-  const failed = results.filter((r) => !r.pass).length;
-  console.log(`\n${item.id} (${item.taskType}) — ${failed} failed`);
+function report(
+  item: DatasetItem,
+  results: CheckResult[],
+  off: string[],
+): void {
+  const declared = new Set(item.expectedFailures);
+  console.log(`\n${item.id} (${item.taskType}) — ${off.length} unaccounted`);
+
   for (const result of results) {
-    console.log(
-      `  ${result.pass ? 'PASS' : 'FAIL'} ${result.id}: ${result.detail}`,
-    );
+    const verdict = result.pass
+      ? 'PASS'
+      : declared.has(result.id)
+        ? 'FAIL (declared)'
+        : 'FAIL';
+    console.log(`  ${verdict} ${result.id}: ${result.detail}`);
   }
 }
 
@@ -91,20 +99,23 @@ async function main() {
 
   const results = dataset.map((item) => {
     const checks = evaluateItem(rubric, item);
-    report(item, checks);
+    const off = deviations(item, checks);
+    report(item, checks, off);
     return {
       id: item.id,
       file: item.file,
       taskType: item.taskType,
       deterministic: checks,
-      pass: checks.every((check) => check.pass),
+      declaredFailures: item.expectedFailures,
+      deviations: off,
+      pass: off.length === 0,
     };
   });
 
   const passed = results.filter((r) => r.pass).length;
   if (dataset.length > 0) {
     console.log(
-      `\nDeterministic checks: ${passed}/${results.length} items passed`,
+      `\nDeterministic checks: ${passed}/${results.length} items behave as declared`,
     );
   }
   if (passed < results.length || dataset.length === 0) process.exitCode = 1;
@@ -120,7 +131,7 @@ async function main() {
     if (withJudge && dataset.length > 0) {
       if (passed < results.length && !force) {
         console.error(
-          `\nNot judging: ${results.length - passed} items fail the deterministic layer, so the calibration would measure a corpus that is known to be wrong. Fix them, or rerun with --force.`,
+          `\nNot judging: ${results.length - passed} items deviate from the deterministic layer in ways they do not declare, so the calibration would measure a corpus that is known to be wrong. Fix them, declare the failure in expected_failures, or rerun with --force.`,
         );
       } else {
         output.judge = await runJudge(rubric, dataset);

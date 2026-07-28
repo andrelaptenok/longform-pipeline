@@ -33,6 +33,15 @@ export function checkSpecsFor(rubric: Rubric, item: DatasetItem): CheckSpec[] {
     }
   }
 
+  for (const id of item.expectedFailures) {
+    if (!known.includes(id)) {
+      fail(
+        item.file,
+        `expected_failures names ${id}, which is not a check in the rubric (known: ${known.join(', ')})`,
+      );
+    }
+  }
+
   return rubric.deterministic.map((check) => ({
     id: check.id,
     params: paramsFor(check, item),
@@ -41,4 +50,21 @@ export function checkSpecsFor(rubric: Rubric, item: DatasetItem): CheckSpec[] {
 
 export function evaluateItem(rubric: Rubric, item: DatasetItem): CheckResult[] {
   return runChecks(item.reference, checkSpecsFor(rubric, item));
+}
+
+export function deviations(
+  item: DatasetItem,
+  results: CheckResult[],
+): string[] {
+  const declared = new Set(item.expectedFailures);
+
+  return results.flatMap((result) => {
+    if (!result.pass && !declared.has(result.id)) {
+      return [`${result.id}: ${result.detail}`];
+    }
+    if (result.pass && declared.has(result.id)) {
+      return [`${result.id}: declared in expected_failures, but it passed`];
+    }
+    return [];
+  });
 }

@@ -6,6 +6,7 @@ source: self-authored
 expected:
   length: { min_words: 200, max_words: 250 }
   sections_present: { required: [greeting, body, closing] }
+expected_failures: []
 human_scores: { content: 5, coherence: 4, range: 4, accuracy: 5 }
 ---
 
@@ -14,9 +15,9 @@ like, in the format the brief asks for.
 
 Copy this file into `drafts/` while the material is being written, then into
 `train/` or `test/` once it carries `human_scores`. The file name has to match
-its `id` — the corpus gate checks that they agree. `derived_from`,
-`expected` and `human_scores` are the optional fields; the last two are needed
-before an item counts as labeled.
+its `id` — the corpus gate checks that they agree. `derived_from`, `expected`,
+`expected_failures` and `human_scores` are the optional fields; the last one is
+needed before an item counts as labeled.
 
 - `source` — where the material came from, in one of two forms:
   `self-authored` for a base material, or
@@ -33,10 +34,17 @@ before an item counts as labeled.
   A list replaces the default list instead of extending it, so
   `banned_constructions: { patterns: [] }` disables the check for this item —
   write it only when that is what you mean.
+- `expected_failures` — the deterministic checks this material is meant to fail,
+  by check id. A degraded variant that breaks the task on purpose — too short,
+  written in the wrong format — declares it here, and the gate then requires
+  exactly those failures: an undeclared one is a broken item, and a declared one
+  that passes means the defect did not land. Omit the field on anything that
+  should pass the whole layer. Unlike an `expected` override, this keeps the
+  check running and its verdict visible.
 - `human_scores` — the expert scores, one per judge dimension in `rubric.yaml`,
-  each 1 to 5, assigned against the anchors there. This is the ground truth the
-  LLM-judge is calibrated against, so it is scored by a person reading the
-  anchors, never by a model.
+  each on the scale that dimension declares, assigned against the anchors there.
+  This is the ground truth the LLM-judge is calibrated against, so it is scored
+  by a person reading the anchors, never by a model.
 
 `docs/labeling-protocol.md` describes how the scores are assigned and how a
 variant is derived. `npm test` checks that every committed item parses, carries

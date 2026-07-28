@@ -55,5 +55,9 @@
 - the 0-5 scale of the CKE scheme, so that a response which fails the task can
   be recorded as CKE would record it, with the gate between criteria executable
   on both 0 and 1
+- `expected_failures`: a degraded material declares the deterministic checks it
+  is meant to break, and the gate requires exactly those — which is what lets
+  the corpus hold a material that is too short or in the wrong format without
+  the deterministic layer reading as broken
 - the LLM-judge, the agreement metrics (QWK, MAE, exact, within 1, Spearman)
   and the calibration that pairs judge scores with expert ones per dimension
